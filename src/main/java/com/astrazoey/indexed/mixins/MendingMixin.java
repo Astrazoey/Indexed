@@ -31,9 +31,9 @@ public class MendingMixin {
 
             int enchantmentLevel = EnchantmentHelper.getLevel(Enchantments.MENDING, itemStack);
 
-            System.out.println("Start amount = " + this.amount);
+            //System.out.println("Start amount = " + this.amount);
             this.amount = amount * enchantmentLevel;
-            System.out.println("End amount = " + this.amount);
+            //System.out.println("End amount = " + this.amount);
         }
     }
 

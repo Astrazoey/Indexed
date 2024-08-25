@@ -202,6 +202,13 @@ class InfinityEnchantmentMixin extends Enchantment {
         super(weight, type, slotTypes);
     }
 
+    /**
+     * @author Astrazoey
+     */
+    public int getMaxLevel() {
+        return 5;
+    }
+
     public boolean canAccept(Enchantment other) {
         return ((Enchantment) (Object) this) != other;
     }

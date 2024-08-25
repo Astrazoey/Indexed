@@ -48,7 +48,7 @@ public class PlayerEntityMixin {
     @Inject(method = "canHarvest", at = @At(value = "HEAD"), cancellable = true)
     public void canHarvest(BlockState state, CallbackInfoReturnable<Boolean> cir) {
 
-        System.out.println("can harvest has run");
+        //System.out.println("can harvest has run");
 
         ItemStack itemStack = ((PlayerEntity) (Object) this).getInventory().getMainHandStack();
         Item item = itemStack.getItem();
@@ -57,17 +57,17 @@ public class PlayerEntityMixin {
         int silkTouchLevel = EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, itemStack);
 
         if(silkTouchLevel > 1) {
-            System.out.println("item has silk touch");
+            //System.out.println("item has silk touch");
             if(item instanceof ToolItem) {
 
-                System.out.println("mining level is before math: " + miningLevel);
+                //System.out.println("mining level is before math: " + miningLevel);
 
                 miningLevel = ((ToolItem) item).getMaterial().getMiningLevel() + silkTouchLevel-1;
 
-                System.out.println("mining level is after math: " + miningLevel);
+                //System.out.println("mining level is after math: " + miningLevel);
 
                 if(miningLevel >= MiningLevelManager.getRequiredMiningLevel(state)) {
-                    System.out.println("setting new return value");
+                    //System.out.println("setting new return value");
                     cir.setReturnValue(true);
                 }
 

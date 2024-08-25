@@ -20,7 +20,7 @@ public class FlameMixin {
 @Mixin(BowItem.class)
 class FlameBowMixin extends Item implements SetFlameEnchantmentLevel {
 
-    public int flameEnchantmentLevel = 1;
+    public int flameEnchantmentLevel = 0;
 
     public FlameBowMixin(Settings settings) {
         super(settings);
@@ -32,34 +32,48 @@ class FlameBowMixin extends Item implements SetFlameEnchantmentLevel {
         flameEnchantmentLevel = EnchantmentHelper.getLevel(Enchantments.FLAME, stack);
     }
 
+
+
     @Redirect(method="onStoppedUsing", at = @At(value = "INVOKE", target ="Lnet/minecraft/world/World;spawnEntity(Lnet/minecraft/entity/Entity;)Z"))
     public boolean setFlameEnchantment(World world, Entity entity) {
 
-        SetFlameEnchantmentLevel.set((PersistentProjectileEntity) entity, flameEnchantmentLevel);
+        if(flameEnchantmentLevel > 0) {
+            SetFlameEnchantmentLevel.set((PersistentProjectileEntity) entity, flameEnchantmentLevel);
+        }
+
         world.spawnEntity(entity);
         return true;
     }
+
+
+
+
 
     @Override
     public void setFlameEnchantmentLevel(int flameLevel) {
 
     }
+
+
 }
 
 @Mixin(PersistentProjectileEntity.class)
 class FlameProjectileMixin implements SetFlameEnchantmentLevel {
 
-    public int flameEnchantmentLevel = 1;
+    public int flameEnchantmentLevel = 0;
 
     @Inject(method="applyEnchantmentEffects", at = @At(value ="HEAD"))
     public void getFlameEnchantmentLevel(LivingEntity entity, float damageModifier, CallbackInfo ci) {
         flameEnchantmentLevel = EnchantmentHelper.getEquipmentLevel(Enchantments.FLAME, entity);
+        System.out.println("flame enchantment level is " + flameEnchantmentLevel + " at head");
     }
 
     @Redirect(method="onEntityHit", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setOnFireFor(I)V"))
     public void adjustFlame(Entity entity, int seconds) {
-        int newAmount = 5+((flameEnchantmentLevel-1)*3);
-        entity.setOnFireFor(newAmount);
+        if(flameEnchantmentLevel > 0) {
+            int newAmount = 5+((flameEnchantmentLevel-1)*3);
+            entity.setOnFireFor(newAmount);
+        }
     }
 
     @Override
@@ -67,4 +81,6 @@ class FlameProjectileMixin implements SetFlameEnchantmentLevel {
         flameEnchantmentLevel = flameLevel;
         System.out.println("set flame level to " + flameLevel);
     }
+
+
 }

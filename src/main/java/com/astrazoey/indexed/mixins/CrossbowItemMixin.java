@@ -69,32 +69,56 @@ public abstract class CrossbowItemMixin extends Item {
         int maxCounter = (((EnchantmentHelper.getLevel(Enchantments.MULTISHOT, stack))-1)*2);
 
 
-        for(int counter = 0; counter < maxCounter; counter++){
-            if(counter == 0) {
-                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed, divergence, 5.0F);
-            }
-            if(counter == 1) {
-                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed, divergence, -5.0F);
-            }
-            if(counter == 2) {
-                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/1.1f, divergence, 7.5F);
-            }
-            if(counter == 3) {
-                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/1.1f, divergence, -7.5F);
-            }
-            if(counter == 4) {
-                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/1.1f, divergence, 2.5F);
-            }
-            if(counter == 5) {
-                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/1.1f, divergence, -2.5F);
-            }
-            if(counter == 6) {
-                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/1.3f, divergence, 12.5F);
-            }
-            if(counter == 7) {
-                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/1.3f, divergence, -12.5F);
+        float speedReduction = 1.0f;
+        int arrowCount = 0;
+
+        if(maxCounter > 0) {
+            for (int counter = 1; counter <= maxCounter; counter++) {
+
+                if(Math.random() > 0.75d) {
+                    arrowCount++;
+
+                    if (counter % 2 != 0) {
+                        shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed / speedReduction, divergence, 3F * arrowCount);
+                    } else {
+                        shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed / speedReduction, divergence, -3F * arrowCount);
+                        //speedReduction = speedReduction + 0.3f;
+                    }
+                }
+
+
             }
         }
+
+        /*
+        for(int counter = 0; counter < maxCounter; counter++){
+            if(counter == 0) {
+                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/2, divergence, 2.5F);
+            }
+            if(counter == 1) {
+                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/2, divergence, -2.5F);
+            }
+            if(counter == 2) {
+                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/3, divergence, 5.0F);
+            }
+            if(counter == 3) {
+                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/3, divergence, -5.0F);
+            }
+            if(counter == 4) {
+                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/4, divergence, 7.5F);
+            }
+            if(counter == 5) {
+                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/4, divergence, -7.5F);
+            }
+            if(counter == 6) {
+                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/5, divergence, 10.0F);
+            }
+            if(counter == 7) {
+                shoot(world, entity, hand, stack, itemStack, fs[i], bl, speed/5, divergence, -10.0F);
+            }
+        }
+
+         */
 
         if(EnchantmentHelper.getLevel(Enchantments.MULTISHOT, stack) >= 5 && entity instanceof ServerPlayerEntity) {
             //Indexed.MULTISHOT_CROSSBOW.trigger((ServerPlayerEntity) entity);
