@@ -1,45 +1,39 @@
 package com.astrazoey.indexed.criterion;
 
-import com.google.gson.JsonObject;
-import net.minecraft.advancement.criterion.AbstractCriterion;
-import net.minecraft.advancement.criterion.AbstractCriterionConditions;
-import net.minecraft.predicate.entity.AdvancementEntityPredicateDeserializer;
-import net.minecraft.predicate.entity.EntityPredicate;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 
-public class RepairItemCriterion extends AbstractCriterion<RepairItemCriterion.Conditions> {
+import com.mojang.serialization.Codec;
+import net.minecraft.advancement.PlayerAdvancementTracker;
+import net.minecraft.advancement.criterion.*;
+import net.minecraft.predicate.entity.LootContextPredicateValidator;
+public class RepairItemCriterion implements Criterion<RepairItemCriterion.Conditions> {
 
-    static final Identifier ID = new Identifier("repair_item");
+    public RepairItemCriterion() {
 
-    @Override
-    public Identifier getId() {
-        return ID;
     }
 
-    public RepairItemCriterion.Conditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended player, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
-        return new RepairItemCriterion.Conditions(player);
+    public void beginTrackingCondition(PlayerAdvancementTracker manager, ConditionsContainer<RepairItemCriterion.Conditions> conditions) {
     }
 
-    public void trigger(ServerPlayerEntity player) {
-        this.trigger(player, (conditions) -> {
-            return conditions.matches(player);
-        });
+    public void endTrackingCondition(PlayerAdvancementTracker manager, ConditionsContainer<RepairItemCriterion.Conditions> conditions) {
     }
 
+    public void endTracking(PlayerAdvancementTracker tracker) {
+    }
 
-    public static class Conditions extends AbstractCriterionConditions {
+    public Codec<RepairItemCriterion.Conditions> getConditionsCodec() {
+        return RepairItemCriterion.Conditions.CODEC;
+    }
 
-        public Conditions(EntityPredicate.Extended player) {
-            super(RepairItemCriterion.ID, player);
+    public static record Conditions() implements CriterionConditions {
+        public static final Codec<RepairItemCriterion.Conditions> CODEC = Codec.unit(new RepairItemCriterion.Conditions());
+
+        public Conditions() {
         }
 
-        public static RepairItemCriterion.Conditions create() {
-            return new RepairItemCriterion.Conditions(EntityPredicate.Extended.EMPTY);
-        }
-
-        public boolean matches(ServerPlayerEntity player) {
-            return true;
+        public void validate(LootContextPredicateValidator validator) {
         }
     }
+
+
 }
+

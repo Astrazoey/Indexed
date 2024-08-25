@@ -26,7 +26,7 @@ public class KeepingEnchantment extends Enchantment {
 
     @Override
     public boolean isAvailableForEnchantedBookOffer() {
-        return true;
+        return false;
     }
 
     @Override

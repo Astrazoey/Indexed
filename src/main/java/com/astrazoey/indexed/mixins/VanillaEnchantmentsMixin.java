@@ -24,7 +24,6 @@ class AquaAffinityEnchantmentMixin extends Enchantment {
     /**
      * @author Astrazoey
      */
-    @Overwrite
     public int getMaxLevel() {
         return 5;
     }
@@ -41,6 +40,8 @@ class ChannelingEnchantmentMixin extends Enchantment {
     protected ChannelingEnchantmentMixin(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
         super(weight, type, slotTypes);
     }
+
+    public int getMaxLevel() { return 5; }
 
     @Override
     public boolean isAvailableForEnchantedBookOffer() {
@@ -145,7 +146,6 @@ class FlameEnchantmentMixin extends Enchantment {
     /**
      * @author Astrazoey
      */
-    @Overwrite
     public int getMaxLevel() {
         return 5;
     }
@@ -181,10 +181,17 @@ class ImpalingEnchantmentMixin extends Enchantment {
     @Override
     public void onTargetDamaged(LivingEntity user, Entity target, int level) {
         if(target instanceof LivingEntity && target.isTouchingWaterOrRain()) {
-            DamageSource source = DamageSource.mob(user);
-            target.damage(source, level*2);
+            DamageSource source = target.getWorld().getDamageSources().mobAttack(user);
+
+            target.damage(source, level*2.5f);
         }
     }
+
+    @Override
+    public float getAttackDamage(int level, EntityGroup group) {
+        return 0.0F;
+    }
+
 
 
 }
@@ -300,7 +307,7 @@ class MendingEnchantmentMixin extends Enchantment {
     /**
      * @author Astrazoey
      */
-    @Overwrite
+
     public int getMaxLevel() {
         return 5;
     }
@@ -339,7 +346,6 @@ class MultishotEnchantmentMixin extends Enchantment {
     /**
      * @author Astrazoey
      */
-    @Overwrite
     public int getMaxLevel() {
         return 5;
     }
@@ -511,6 +517,13 @@ class SilkTouchEnchantmentMixin extends Enchantment {
         super(Rarity.RARE, type, slotTypes);
     }
 
+    /**
+     * @author Astrazoey
+     */
+    public int getMaxLevel() {
+        return 5;
+    }
+
     @Override
     public boolean isAvailableForEnchantedBookOffer() {
         return !ConfigMain.enableVillagerNerfs;
@@ -549,6 +562,21 @@ class SweepingEnchantmentMixin extends Enchantment {
     @Override
     public boolean isAvailableForEnchantedBookOffer() {
         return !ConfigMain.enableVillagerNerfs;
+    }
+}
+
+@Mixin(SwiftSneakEnchantment.class)
+class SwiftSneakEnchantmentMixin extends Enchantment {
+    protected SwiftSneakEnchantmentMixin(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
+        super(weight, type, slotTypes);
+    }
+
+    /**
+     * @author Astrazoey
+     */
+    @Overwrite
+    public int getMaxLevel() {
+        return 5;
     }
 }
 

@@ -2,7 +2,11 @@ package com.astrazoey.indexed.mixins;
 
 import com.astrazoey.indexed.ConfigMain;
 import net.minecraft.enchantment.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityGroup;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -166,13 +170,23 @@ class FrostWalkerEnchantmentMixin {
 @Mixin(ImpalingEnchantment.class)
 class ImpalingEnchantmentMixin extends Enchantment {
     protected ImpalingEnchantmentMixin(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
-        super(weight, type, slotTypes);
+        super(Rarity.UNCOMMON, type, slotTypes);
     }
 
     @Override
     public boolean isAvailableForEnchantedBookOffer() {
         return !ConfigMain.enableVillagerNerfs;
     }
+
+    @Override
+    public void onTargetDamaged(LivingEntity user, Entity target, int level) {
+        if(target instanceof LivingEntity && target.isTouchingWaterOrRain()) {
+            DamageSource source = DamageSource.mob(user);
+            target.damage(source, level*2);
+        }
+    }
+
+
 }
 
 @Mixin(InfinityEnchantment.class)
@@ -214,7 +228,7 @@ class KnockbackEnchantmentMixin extends Enchantment {
 @Mixin(LoyaltyEnchantment.class)
 class LoyaltyEnchantmentMixin extends Enchantment {
     protected LoyaltyEnchantmentMixin(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
-        super(weight, type, slotTypes);
+        super(Rarity.RARE, type, slotTypes);
     }
 
     /**
@@ -319,7 +333,7 @@ class MendingEnchantmentMixin extends Enchantment {
 @Mixin(MultishotEnchantment.class)
 class MultishotEnchantmentMixin extends Enchantment {
     protected MultishotEnchantmentMixin(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
-        super(weight, type, slotTypes);
+        super(Rarity.VERY_RARE, type, slotTypes);
     }
 
     /**
@@ -345,7 +359,7 @@ class MultishotEnchantmentMixin extends Enchantment {
 @Mixin(PiercingEnchantment.class)
 class PiercingEnchantmentMixin extends Enchantment {
     protected PiercingEnchantmentMixin(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
-        super(weight, type, slotTypes);
+        super(Rarity.UNCOMMON, type, slotTypes);
     }
 
     /**
@@ -428,7 +442,7 @@ class PunchEnchantmentMixin extends Enchantment {
 @Mixin(QuickChargeEnchantment.class)
 class QuickChargeEnchantmentMixin extends Enchantment {
     protected QuickChargeEnchantmentMixin(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
-        super(weight, type, slotTypes);
+        super(Rarity.RARE, type, slotTypes);
     }
 
     /**
@@ -535,6 +549,21 @@ class SweepingEnchantmentMixin extends Enchantment {
     @Override
     public boolean isAvailableForEnchantedBookOffer() {
         return !ConfigMain.enableVillagerNerfs;
+    }
+}
+
+@Mixin(SwiftSneakEnchantment.class)
+class SwiftSneakEnchantmentMixin extends Enchantment {
+    protected SwiftSneakEnchantmentMixin(Rarity weight, EnchantmentTarget type, EquipmentSlot[] slotTypes) {
+        super(weight, type, slotTypes);
+    }
+
+    /**
+     * @author Astrazoey
+     */
+    @Overwrite
+    public int getMaxLevel() {
+        return 5;
     }
 }
 

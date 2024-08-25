@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public class ConfigMain {
 
-    private static final float MOD_VERSION = 1.0f;
+    private static final float MOD_VERSION = 1.3f;
 
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("indexed.properties");
 

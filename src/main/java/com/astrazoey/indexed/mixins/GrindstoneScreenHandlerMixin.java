@@ -52,7 +52,7 @@ class GrindstoneTakeOutput {
         if(IndexedClassHelper.booleanThreadLocal != null) {
             if(IndexedClassHelper.booleanThreadLocal.get()) {
                 if(player instanceof ServerPlayerEntity) {
-                    Indexed.GRIND_ESSENCE.trigger((ServerPlayerEntity) player);
+                    //Indexed.GRIND_ESSENCE.trigger((ServerPlayerEntity) player);
                 }
             }
         }

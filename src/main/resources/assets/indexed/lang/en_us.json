@@ -1,9 +1,12 @@
 {
   "item.indexed.enchantment_tooltip": "%d/%d",
   "item.indexed.gold_bound_book": "Gilded Book",
+  "item.indexed.vitalis": "Vitalis",
   "container.indexed.overcharged": "Overcharged!",
   "enchantment.indexed.forgery": "Forgery",
   "enchantment.indexed.forgery.desc": "Decreases repair cost",
+  "enchantment.indexed.debuff_resistance": "Debuff Resistance",
+  "enchantment.indexed.debuff_resistance.desc": "Decreases duration of negative effects",
   "enchantment.indexed.essence": "Essence",
   "enchantment.indexed.essence.desc": "No effect, but saturated with experience",
   "enchantment.indexed.slow_burn": "Slow Burn",
@@ -24,7 +27,7 @@
   "advancements.indexed.story.enchant_gold_book.title": "Etruscan Gold Book",
   "advancements.indexed.story.enchant_gold_book.description": "Increase your chances of getting high level enchantments by enchanting a gold bound book.",
   "advancements.indexed.story.repair_item.title": "Gloves Off",
-  "advancements.indexed.story.repair_item.description": "Repair an item in an anvil using repair items instead of experience.",
+  "advancements.indexed.story.repair_item.description": "Repair an item in an anvil using Vitalis instead of experience.",
   "advancements.indexed.story.keeping.title": "They're a Keeper",
   "advancements.indexed.story.keeping.description": "Enchant an item with Keeping V so you don't lose it on death.",
   "advancements.indexed.story.forgery.title": "Adept Blacksmith",
@@ -57,5 +60,6 @@
   "block.indexed.crystal_globe" : "Crystal Globe",
   "subtitles.indexed.use_crystal_globe" : "Crystal Globe Used",
   "subtitles.indexed.harvest_crystal_globe" : "Crystal Globe Harvested",
-  "subtitles.indexed.crystal_globe_ambient" : "Crystal Globe Whirs"
+  "subtitles.indexed.crystal_globe_ambient" : "Crystal Globe Whirs",
+  "itemGroup.indexed.indexed_item_group_display" : "Indexed"
 }

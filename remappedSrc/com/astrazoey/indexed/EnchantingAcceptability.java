@@ -22,7 +22,7 @@ public class EnchantingAcceptability {
         }
     }
 
-    private boolean acceptableCheck(Enchantment enchantment, ItemStack itemStack) {
+    public boolean acceptableCheck(Enchantment enchantment, ItemStack itemStack) {
         if((enchantment == Indexed.QUICK_FLIGHT && !ConfigMain.enableQuickFlight)) {
             return false;
         }

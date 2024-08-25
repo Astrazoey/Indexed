@@ -1,45 +1,54 @@
 package com.astrazoey.indexed.criterion;
 
-import com.google.gson.JsonObject;
-import net.minecraft.advancement.criterion.AbstractCriterion;
-import net.minecraft.advancement.criterion.AbstractCriterionConditions;
-import net.minecraft.predicate.entity.AdvancementEntityPredicateDeserializer;
-import net.minecraft.predicate.entity.EntityPredicate;
+
+import com.mojang.serialization.Codec;
+import net.minecraft.advancement.PlayerAdvancementTracker;
+import net.minecraft.advancement.criterion.*;
+import net.minecraft.predicate.entity.LootContextPredicateValidator;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 
-public class UseCrystalGlobeCriterion extends AbstractCriterion<UseCrystalGlobeCriterion.Conditions> {
+public class UseCrystalGlobeCriterion implements Criterion<UseCrystalGlobeCriterion.Conditions> {
 
-    static final Identifier ID = new Identifier("use_crystal_globe");
+    public UseCrystalGlobeCriterion() {
 
-    @Override
-    public Identifier getId() {
-        return ID;
-    }
-
-    public UseCrystalGlobeCriterion.Conditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended player, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
-        return new UseCrystalGlobeCriterion.Conditions(player);
     }
 
     public void trigger(ServerPlayerEntity player) {
-        this.trigger(player, (conditions) -> {
-            return conditions.matches(player);
-        });
+
+    }
+
+    public void beginTrackingCondition(PlayerAdvancementTracker manager, ConditionsContainer<UseCrystalGlobeCriterion.Conditions> conditions) {
+    }
+
+    public void endTrackingCondition(PlayerAdvancementTracker manager, ConditionsContainer<UseCrystalGlobeCriterion.Conditions> conditions) {
+    }
+
+    public void endTracking(PlayerAdvancementTracker tracker) {
+    }
+
+    public Codec<UseCrystalGlobeCriterion.Conditions> getConditionsCodec() {
+        return UseCrystalGlobeCriterion.Conditions.CODEC;
     }
 
 
-    public static class Conditions extends AbstractCriterionConditions {
+    public static record Conditions() implements CriterionConditions {
+        public static final Codec<UseCrystalGlobeCriterion.Conditions> CODEC = Codec.unit(new UseCrystalGlobeCriterion.Conditions());
 
-        public Conditions(EntityPredicate.Extended player) {
-            super(UseCrystalGlobeCriterion.ID, player);
+        public Conditions() {
         }
 
-        public static UseCrystalGlobeCriterion.Conditions create() {
-            return new UseCrystalGlobeCriterion.Conditions(EntityPredicate.Extended.EMPTY);
+        public void validate(LootContextPredicateValidator validator) {
         }
 
         public boolean matches(ServerPlayerEntity player) {
             return true;
         }
     }
+
+
+
+
+
+
 }
+

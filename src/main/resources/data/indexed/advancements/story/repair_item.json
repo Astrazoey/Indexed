@@ -2,7 +2,7 @@
   "parent": "indexed:story/root",
   "display": {
     "icon": {
-      "item": "minecraft:iron_ingot"
+      "item": "indexed:vitalis"
     },
     "title": {
       "translate": "advancements.indexed.story.repair_item.title"

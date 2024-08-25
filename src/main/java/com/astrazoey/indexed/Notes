@@ -42,23 +42,31 @@ New Stuff:
  - New "Curse of Mystery" that can be applied to loot which hides enchantments.
  - New "Gilded Book" that's crafted with gold and has extremely high enchantability compared to a regular book. It excludes common enchantments.
  - New "Essence" enchantment that only appears in loot on a gold bound book. This enchantment provides a lot of experience when used in a grindstone.
+ - New "Debuff Resistance" enchantment which decreases the duration of negative status effects by 10 seconds per level.
  - New "Crystal Globe" block that that decrements enchantment levels.
  - When the Crystal Globe is fed enough levels and given an amethyst shard, it will grant the player the "Enchanted" status effect and some experience.
  - The Crystal Globe is more efficient when surrounded by amethyst clusters, but using the Globe can destroy the surrounding clusters.
  - New "Enchanted" status effect that boosts enchanting power by 1 level.
+ - Repair items are removed entirely. They are replaced with a new item called "Vitalis" which can repair any item with durability.
 
 Planned:
- - //TODO: Curse of Deceit: Item lies about its durability.
+ - //TODO: Curse of Deceit: Item lies about its durability. (or hides durability)
  - //TODO: "Reeling" enchantment for fishing rods which allows the line to be cast further.
- - //TODO: Make textures for the Crystal Particle Effect
- - //TODO: Make sounds for the Crystal
- - //TODO: Add Monky's new Enchanted texture
  - //TODO: Nerf Fortune V
  - //TODO: Investigate Gold Bound Book's exclusion of common enchantments
  - //FIXME: Anvil allows Overcharged crafting when Charm's "AnvilImprovementsEnabled" set to true.
  - //FIXME: Keeping enchantment does nothing when Charm's "Totem of Preserving" set to true.
- - //FIXME: Address the Crystal Globe's missing particle texture
+
 
 Things to think about:
  - //Think: Fortune and Silk Touch are mutex
- - //Think: Think of some more enchantments + curses
+
+
+Credit to Artists:
+  - Monke (Enchanted status effect and Gilded Book texture
+  - Vectorwing (Crystal Globe model and texture)
+
+Thank you for the programming help:
+ - Gegy
+ - Cameron
+ - Vectorwing

@@ -1,6 +1,5 @@
 package com.astrazoey.indexed;
 
-import com.astrazoey.indexed.TransformerMixinPlugin.HackerVoice;
 import com.google.common.collect.ImmutableList;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.MappingResolver;

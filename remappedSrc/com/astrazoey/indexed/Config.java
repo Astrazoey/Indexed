@@ -3,10 +3,14 @@ package com.astrazoey.indexed;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registry;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -92,12 +96,10 @@ public class Config {
             ThreadLocal<Identifier> localItemIdentifier = new ThreadLocal<Identifier>();
             localItemIdentifier.set(itemIdentifier);
 
-            Item registerItem = Registry.ITEM.get(localItemIdentifier.get());
+            Item registerItem = Registries.ITEM.get(localItemIdentifier.get());
 
 
             MaxEnchantingSlots.setEnchantType(registerItem, new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(maxSlots).repairScaling(repairScale)));
-
-
 
         }
     }
@@ -229,11 +231,11 @@ public class Config {
         defaultConfig.put("minecraft:trident", EnchantingTypes.TRIDENT.getEnchantabilityConfig());
         defaultConfig.put("minecraft:turtle_helmet", EnchantingTypes.TURTLE_HELMET.getEnchantabilityConfig());
 
-        //Items that only have Unbreaking, Mending, and Forgery
+        //Other
         defaultConfig.put("minecraft:elytra", EnchantingTypes.ELYTRA.getEnchantabilityConfig());
         defaultConfig.put("minecraft:shears", EnchantingTypes.GENERIC.getEnchantabilityConfig());
         defaultConfig.put("minecraft:flint_and_steel", EnchantingTypes.GENERIC.getEnchantabilityConfig());
-        defaultConfig.put("minecraft:shield", EnchantingTypes.GENERIC.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:shield", EnchantingTypes.SHIELD.getEnchantabilityConfig());
         defaultConfig.put("minecraft:carrot_on_a_stick", EnchantingTypes.GENERIC.getEnchantabilityConfig());
         defaultConfig.put("minecraft:warped_fungus_on_a_stick", EnchantingTypes.GENERIC.getEnchantabilityConfig());
 
@@ -245,7 +247,7 @@ public class Config {
 
 
         //Mattock
-        EnchantabilityConfig mattockConfig = new EnchantabilityConfig(5, 2.0f);
+        EnchantabilityConfig mattockConfig = new EnchantabilityConfig(5, 1.0f);
         defaultConfig.put("unitool:mattock", mattockConfig);
 
         //Carve Your Pumpkin
@@ -304,7 +306,7 @@ public class Config {
 
 
         //Better Nether
-        defaultConfig.put("betternether:cincinnasite_shears", EnchantingTypes.SHEARS.getEnchantabilityConfig());
+        defaultConfig.put("betternether:cincinnasite_shears", EnchantingTypes.GENERIC.getEnchantabilityConfig());
 
         defaultConfig.put("betternether:cincinnasite_sword", EnchantingTypes.CINCINNASITE.getEnchantabilityConfig());
         defaultConfig.put("betternether:cincinnasite_axe", EnchantingTypes.CINCINNASITE.getEnchantabilityConfig());
@@ -437,6 +439,133 @@ public class Config {
         defaultConfig.put("dragonloot:dragon_crossbow", dragonExtraConfig);
         defaultConfig.put("dragonloot:dragon_bow", dragonExtraConfig);
         defaultConfig.put("dragonloot:dragon_trident", dragonExtraConfig);
+
+        //Rat Mischeif
+        defaultConfig.put("ratsmischief:rat_mask", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
+
+        //Farmer's Delight
+        defaultConfig.put("farmersdelight:flint_knife", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("farmersdelight:iron_knife", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
+        defaultConfig.put("farmersdelight:golden_knife", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("farmersdelight:diamond_knife", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("farmersdelight:netherite_knife", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
+
+        //Consistency+
+        defaultConfig.put("consistency_plus:turtle_chestplate", EnchantingTypes.TURTLE_HELMET.getEnchantabilityConfig());
+        defaultConfig.put("consistency_plus:turtle_leggings", EnchantingTypes.TURTLE_HELMET.getEnchantabilityConfig());
+        defaultConfig.put("consistency_plus:turtle_boots", EnchantingTypes.TURTLE_HELMET.getEnchantabilityConfig());
+
+        //ValleyCraft
+        defaultConfig.put("valley:rg_helmet", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:rg_chestplate", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:rg_leggings", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:rg_boots", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:rg_sword", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:rg_axe", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:rg_shovel", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:rg_hoe", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:rg_pickaxe", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+
+        defaultConfig.put("valley:wood_knife", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:stone_knife", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:iron_knife", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:golden_knife", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:diamond_knife", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:netherite_knife", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:rg_knife", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:bone_knife", EnchantingTypes.BONE_TIER.getEnchantabilityConfig());
+
+        defaultConfig.put("valley:wood_sickle", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:stone_sickle", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:iron_sickle", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:golden_sickle", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:diamond_sickle", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:netherite_sickle", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:rg_sickle", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+
+        defaultConfig.put("valley:wood_hatchet", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:stone_hatchet", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:iron_hatchet", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:golden_hatchet", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:diamond_hatchet", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:netherite_hatchet", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:rg_hatchet", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+
+        defaultConfig.put("valley:turtle_chestplate", EnchantingTypes.TURTLE_HELMET.getEnchantabilityConfig());
+        defaultConfig.put("valley:turtle_leggings", EnchantingTypes.TURTLE_HELMET.getEnchantabilityConfig());
+        defaultConfig.put("valley:turtle_boots", EnchantingTypes.TURTLE_HELMET.getEnchantabilityConfig());
+
+        defaultConfig.put("valley:tongs", EnchantingTypes.GENERIC.getEnchantabilityConfig());
+        defaultConfig.put("valley:lumber_axe", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
+        defaultConfig.put("valley:fur_chestplate", EnchantingTypes.LEATHER_TIER.getEnchantabilityConfig());
+
+        // Impaled
+        defaultConfig.put("impaled:pitchfork", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
+        defaultConfig.put("impaled:atlan", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("impaled:elder_trident", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("impaled:hellfork", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
+
+        // Harvest Scythes
+        defaultConfig.put("harvest_scythes:wooden_scythe", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("harvest_scythes:stone_scythe", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("harvest_scythes:iron_scythe", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
+        defaultConfig.put("harvest_scythes:golden_scythe", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("harvest_scythes:diamond_scythe", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("harvest_scythes:netherite_scythe", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
+
+        defaultConfig.put("harvest_scythes:wooden_machete", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("harvest_scythes:stone_machete", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("harvest_scythes:iron_machete", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
+        defaultConfig.put("harvest_scythes:golden_machete", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("harvest_scythes:diamond_machete", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("harvest_scythes:netherite_machete", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
+
+        // Go Fish
+        defaultConfig.put("gofish:skeletal_rod", EnchantingTypes.BONE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("gofish:blaze_rod", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("gofish:soul_rod", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("gofish:diamond_reinforced_rod", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("gofish:ender_rod", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("gofish:matrix_rod", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("gofish:frosted_rod", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
+        defaultConfig.put("gofish:slime_rod", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
+        defaultConfig.put("gofish:celestial_rod", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
+
+        // Additional Additions
+        defaultConfig.put("additionaladditions:rose_gold_helmet", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:rose_gold_chestplate", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:rose_gold_leggings", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:rose_gold_boots", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:rose_gold_sword", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:rose_gold_axe", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:rose_gold_shovel", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:rose_gold_hoe", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:rose_gold_pickaxe", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+
+        defaultConfig.put("additionaladditions:gilded_netherite_helmet", EnchantingTypes.NETHERITE_GILDED.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:gilded_netherite_chestplate", EnchantingTypes.NETHERITE_GILDED.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:gilded_netherite_leggings", EnchantingTypes.NETHERITE_GILDED.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:gilded_netherite_boots", EnchantingTypes.NETHERITE_GILDED.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:gilded_netherite_sword", EnchantingTypes.NETHERITE_GILDED.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:gilded_netherite_axe", EnchantingTypes.NETHERITE_GILDED.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:gilded_netherite_shovel", EnchantingTypes.NETHERITE_GILDED.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:gilded_netherite_hoe", EnchantingTypes.NETHERITE_GILDED.getEnchantabilityConfig());
+        defaultConfig.put("additionaladditions:gilded_netherite_pickaxe", EnchantingTypes.NETHERITE_GILDED.getEnchantabilityConfig());
+
+        defaultConfig.put("additionaladditions:crossbow_with_spyglass", EnchantingTypes.CROSSBOW.getEnchantabilityConfig());
+
+        // Oxidized
+        defaultConfig.put("oxidized:rose_gold_sword", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("oxidized:rose_gold_axe", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("oxidized:rose_gold_shovel", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("oxidized:rose_gold_hoe", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("oxidized:rose_gold_pickaxe", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+
+        // Conjuring
+        defaultConfig.put("conjuring:soul_alloy_sword", EnchantingTypes.SOUL_ALLOY.getEnchantabilityConfig());
+        defaultConfig.put("conjuring:soul_alloy_shovel", EnchantingTypes.SOUL_ALLOY.getEnchantabilityConfig());
+        defaultConfig.put("conjuring:soul_alloy_hatchet", EnchantingTypes.SOUL_ALLOY.getEnchantabilityConfig());
+        defaultConfig.put("conjuring:soul_alloy_pickaxe", EnchantingTypes.SOUL_ALLOY.getEnchantabilityConfig());
 
         File directory = configFile.getParentFile();
         if(directory.exists()) {

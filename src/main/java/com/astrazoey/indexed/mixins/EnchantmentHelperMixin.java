@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.EnchantmentScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,7 +23,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
-import java.util.Random;
 
 import static java.lang.Math.min;
 
@@ -48,7 +48,7 @@ public class EnchantmentHelperMixin {
     @ModifyConstant(method = "generateEnchantments", constant = @Constant(intValue = 50, ordinal = 0))
     private static int increaseGoldBookEffectiveness(int constant) {
         if(generatedItemType.get().isOf(IndexedItems.GOLD_BOUND_BOOK)) {
-            return 25;
+            return 15;
         } else {
             return constant;
         }
@@ -93,7 +93,7 @@ class TakeEnchantment {
     @Inject(method = "method_17410", at = @At(value="INVOKE", target = "Lnet/minecraft/advancement/criterion/EnchantedItemCriterion;trigger(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/item/ItemStack;I)V"))
     public void grantGoldBookAdvancement(ItemStack itemStack, int i, PlayerEntity playerEntity, int j, ItemStack itemStack2, World world, BlockPos pos, CallbackInfo ci) {
         if(itemStack.isOf(IndexedItems.GOLD_BOUND_BOOK)) {
-            Indexed.ENCHANT_GOLD_BOOK.trigger((ServerPlayerEntity) playerEntity);
+            //Indexed.ENCHANT_GOLD_BOOK.trigger((ServerPlayerEntity) playerEntity);
         }
     }
 
@@ -108,7 +108,7 @@ class TakeEnchantment {
 
         if(effectLevel.get() > 0) {
             if(playerEntity instanceof ServerPlayerEntity) {
-                Indexed.ENCHANTED_ADVANCEMENT.trigger((ServerPlayerEntity) playerEntity);
+                //Indexed.ENCHANTED_ADVANCEMENT.trigger((ServerPlayerEntity) playerEntity);
             }
         }
 
@@ -141,7 +141,7 @@ class TakeEnchantment {
 
         if(MaxEnchantingSlots.getEnchantType(stack) != null) {
             if(MaxEnchantingSlots.getCurrent(stack) > MaxEnchantingSlots.getEnchantType(stack).getMaxEnchantingSlots()) {
-                Indexed.OVERCHARGE_ITEM.trigger(player);
+                //Indexed.OVERCHARGE_ITEM.trigger(player);
             }
         }
 

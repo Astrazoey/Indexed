@@ -7,9 +7,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registry;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -95,7 +96,7 @@ public class Config {
             ThreadLocal<Identifier> localItemIdentifier = new ThreadLocal<Identifier>();
             localItemIdentifier.set(itemIdentifier);
 
-            Item registerItem = Registry.ITEM.get(localItemIdentifier.get());
+            Item registerItem = Registries.ITEM.get(localItemIdentifier.get());
 
 
             MaxEnchantingSlots.setEnchantType(registerItem, new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(maxSlots).repairScaling(repairScale)));
@@ -230,11 +231,11 @@ public class Config {
         defaultConfig.put("minecraft:trident", EnchantingTypes.TRIDENT.getEnchantabilityConfig());
         defaultConfig.put("minecraft:turtle_helmet", EnchantingTypes.TURTLE_HELMET.getEnchantabilityConfig());
 
-        //Items that only have Unbreaking, Mending, and Forgery
+        //Other
         defaultConfig.put("minecraft:elytra", EnchantingTypes.ELYTRA.getEnchantabilityConfig());
         defaultConfig.put("minecraft:shears", EnchantingTypes.GENERIC.getEnchantabilityConfig());
         defaultConfig.put("minecraft:flint_and_steel", EnchantingTypes.GENERIC.getEnchantabilityConfig());
-        defaultConfig.put("minecraft:shield", EnchantingTypes.GENERIC.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:shield", EnchantingTypes.SHIELD.getEnchantabilityConfig());
         defaultConfig.put("minecraft:carrot_on_a_stick", EnchantingTypes.GENERIC.getEnchantabilityConfig());
         defaultConfig.put("minecraft:warped_fungus_on_a_stick", EnchantingTypes.GENERIC.getEnchantabilityConfig());
 
@@ -246,7 +247,7 @@ public class Config {
 
 
         //Mattock
-        EnchantabilityConfig mattockConfig = new EnchantabilityConfig(5, 2.0f);
+        EnchantabilityConfig mattockConfig = new EnchantabilityConfig(5, 1.0f);
         defaultConfig.put("unitool:mattock", mattockConfig);
 
         //Carve Your Pumpkin
@@ -305,7 +306,7 @@ public class Config {
 
 
         //Better Nether
-        defaultConfig.put("betternether:cincinnasite_shears", EnchantingTypes.SHEARS.getEnchantabilityConfig());
+        defaultConfig.put("betternether:cincinnasite_shears", EnchantingTypes.GENERIC.getEnchantabilityConfig());
 
         defaultConfig.put("betternether:cincinnasite_sword", EnchantingTypes.CINCINNASITE.getEnchantabilityConfig());
         defaultConfig.put("betternether:cincinnasite_axe", EnchantingTypes.CINCINNASITE.getEnchantabilityConfig());

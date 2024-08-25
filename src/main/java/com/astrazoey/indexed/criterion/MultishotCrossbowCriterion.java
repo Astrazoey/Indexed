@@ -1,3 +1,4 @@
+/*
 package com.astrazoey.indexed.criterion;
 
 import com.google.gson.JsonObject;
@@ -43,3 +44,6 @@ public class MultishotCrossbowCriterion extends AbstractCriterion<MultishotCross
         }
     }
 }
+
+
+ */

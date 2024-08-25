@@ -104,12 +104,12 @@ class LivingEntityMixin {
         Entity entity = (Entity) (Object) this;
 
         if(EnchantmentHelper.getEquipmentLevel(Enchantments.CHANNELING, (LivingEntity) (Object) this) > 0) {
-            if (((LivingEntity) (Object) this).world.isSkyVisible(((LivingEntity) (Object) this).getBlockPos())) {
-                LightningEntity lightningEntity = (LightningEntity) EntityType.LIGHTNING_BOLT.create(((LivingEntity) (Object) this).world);
+            if (((LivingEntity) (Object) this).getWorld().isSkyVisible(((LivingEntity) (Object) this).getBlockPos())) {
+                LightningEntity lightningEntity = (LightningEntity) EntityType.LIGHTNING_BOLT.create(((LivingEntity) (Object) this).getWorld());
                 assert lightningEntity != null;
                 lightningEntity.refreshPositionAfterTeleport(Vec3d.ofBottomCenter(((LivingEntity) (Object) this).getBlockPos()));
                 lightningEntity.setChanneler(entity instanceof ServerPlayerEntity ? (ServerPlayerEntity)entity : null);
-                ((LivingEntity) (Object) this).world.spawnEntity(lightningEntity);
+                ((LivingEntity) (Object) this).getWorld().spawnEntity(lightningEntity);
                 SoundEvent soundEvent = SoundEvents.ITEM_TRIDENT_THUNDER;
                 ((LivingEntity) (Object) this).playSound(soundEvent, 5.0F, 1.0F);
             }

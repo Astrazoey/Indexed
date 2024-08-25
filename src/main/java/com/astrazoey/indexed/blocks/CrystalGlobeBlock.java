@@ -1,8 +1,10 @@
 package com.astrazoey.indexed.blocks;
 
 import com.astrazoey.indexed.Indexed;
+import com.astrazoey.indexed.registry.IndexedItems;
+import com.astrazoey.indexed.registry.IndexedParticles;
 import net.minecraft.block.*;
-import net.minecraft.client.util.math.Vector3d;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.ai.pathing.NavigationType;
@@ -67,11 +69,18 @@ public class CrystalGlobeBlock extends Block {
         return start + alpha * (finish - start);
     }
 
-    private Vector3d lerpVector(Vector3d start, Vector3d finish, double alpha) {
-        return new Vector3d(
+    private Vec3d lerpVector(Vec3d start, Vec3d finish, double alpha) {
+        return new Vec3d(
                 lerpDouble(start.x, finish.x, alpha),
                 lerpDouble(start.y, finish.y, alpha),
                 lerpDouble(start.z, finish.z, alpha));
+    }
+
+    private void crystalUseEffects(BlockState state, World world, BlockPos pos) {
+        world.playSound(null, pos, Indexed.CRYSTAL_USE_SOUND_EVENT, SoundCategory.BLOCKS, 0.2f, getRandomPitch(world));
+        if(world instanceof ServerWorld) {
+            ((ServerWorld) world).spawnParticles(IndexedParticles.CRYSTAL_BREAK, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, 20, 0.25, 0.25, 0.25, 0);
+        }
     }
 
     @Override
@@ -121,18 +130,14 @@ public class CrystalGlobeBlock extends Block {
             }
 
             if(totalEnchants > 0) {
-                world.playSound(null, pos, Indexed.CRYSTAL_USE_SOUND_EVENT, SoundCategory.BLOCKS, 0.2f, 0.8f + world.getRandom().nextFloat(0.4f));
-
-                if(world instanceof ServerWorld) {
-                    ((ServerWorld) world).spawnParticles(Indexed.CRYSTAL_BREAK, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, 20, 0.25, 0.25, 0.25, 0);
-                }
+                crystalUseEffects(state, world, pos);
 
                 return ActionResult.SUCCESS;
             } else {
                 return ActionResult.FAIL;
             }
         } else if(player.getMainHandStack().isEmpty() && state.get(LEVEL) >= MAX_LEVEL) {
-            world.playSound(null, pos, Indexed.CRYSTAL_HARVEST_SOUND_EVENT, SoundCategory.BLOCKS, 1f, 0.9f + world.getRandom().nextFloat(0.2f));
+            world.playSound(null, pos, Indexed.CRYSTAL_HARVEST_SOUND_EVENT, SoundCategory.BLOCKS, 1f, getRandomPitch(world));
 
             world.setBlockState(pos, state.with(LEVEL, 0), Block.NOTIFY_ALL);
             StatusEffectInstance statusEffectInstance = new StatusEffectInstance(Indexed.ENCHANTED_STATUS_EFFECT, 300*20);
@@ -147,10 +152,25 @@ public class CrystalGlobeBlock extends Block {
             if(player instanceof ServerPlayerEntity) {
                 Indexed.USE_CRYSTAL_GLOBE.trigger((ServerPlayerEntity) player);
                 if(finalClusterCount >= MAX_LEVEL) {
-                    Indexed.FILL_CRYSTAL_GLOBE.trigger((ServerPlayerEntity) player);
+                    //Indexed.FILL_CRYSTAL_GLOBE.trigger((ServerPlayerEntity) player);
                 }
 
             }
+
+
+            return ActionResult.SUCCESS;
+        } else if(player.getStackInHand(hand).isOf(IndexedItems.VITALIS)
+                || player.getStackInHand(hand).isOf(Items.ECHO_SHARD)) {
+            crystalUseEffects(state, world, pos);
+
+            if(world instanceof ServerWorld) {
+                this.dropExperience((ServerWorld) world, pos, 10);
+            }
+
+            if(!player.isCreative()) {
+                player.getStackInHand(hand).decrement(1);
+            }
+
 
 
             return ActionResult.SUCCESS;
@@ -171,9 +191,6 @@ public class CrystalGlobeBlock extends Block {
             world.setBlockState(pos, state.with(LEVEL, i), Block.NOTIFY_ALL);
 
 
-
-
-
         }
     }
 
@@ -186,14 +203,14 @@ public class CrystalGlobeBlock extends Block {
             if(!world.isClient()) {
                 world.breakBlock(checkedPos, true, null, Block.NOTIFY_ALL);
 
-                Vector3d positionOne = new Vector3d(pos.getX(), pos.getY(),pos.getZ());
-                Vector3d positionTwo = new Vector3d(checkedPos.getX(), checkedPos.getY(), checkedPos.getZ());
-                Vector3d positionLerp;
+                Vec3d positionOne = new Vec3d(pos.getX(), pos.getY(),pos.getZ());
+                Vec3d positionTwo = new Vec3d(checkedPos.getX(), checkedPos.getY(), checkedPos.getZ());
+                Vec3d positionLerp;
 
                 for(double alpha = 0; alpha <= 1; alpha+=0.025) {
                     positionLerp = lerpVector(positionOne, positionTwo, alpha);
                     if(world instanceof ServerWorld) {
-                        ((ServerWorld)world).spawnParticles(Indexed.CRYSTAL_BREAK, positionLerp.x+0.5, positionLerp.y+0.5, positionLerp.z+0.5, 1, 0, 0, 0, 0);
+                        ((ServerWorld)world).spawnParticles(IndexedParticles.CRYSTAL_BREAK, positionLerp.x+0.5, positionLerp.y+0.5, positionLerp.z+0.5, 1, 0, 0, 0, 0);
                     }
                 }
             }
@@ -242,15 +259,20 @@ public class CrystalGlobeBlock extends Block {
                 state.getBlock() == Blocks.AMETHYST_CLUSTER;
     }
 
-    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, net.minecraft.util.math.random.Random random) {
         if (random.nextInt(3) == 0 && state.get(LEVEL) >= MAX_LEVEL) {
-            world.addParticle(Indexed.CRYSTAL_HARVEST, pos.getX()+(random.nextDouble(1)), pos.getY()+(random.nextDouble(1)), pos.getZ()+(random.nextDouble(1)), random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D);
+            world.addParticle(IndexedParticles.CRYSTAL_HARVEST, pos.getX() + world.getRandom().nextFloat()*1, pos.getY()+ world.getRandom().nextFloat()*1, pos.getZ()+ world.getRandom().nextFloat()*1, random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D);
         }
 
         if (random.nextInt(24) == 0 && state.get(LEVEL) >= MAX_LEVEL) {
-            world.playSound(pos.getX(), pos.getY(), pos.getZ(), Indexed.CRYSTAL_AMBIENT_SOUND_EVENT, SoundCategory.BLOCKS, 2f, 0.8f + world.getRandom().nextFloat(0.4f), true);
+            world.playSound(pos.getX(), pos.getY(), pos.getZ(), Indexed.CRYSTAL_AMBIENT_SOUND_EVENT, SoundCategory.BLOCKS, 2f, getRandomPitch(world), true);
         }
 
+    }
+
+    private float getRandomPitch(World world) {
+        return 0.8f + (world.getRandom().nextFloat() * 0.4f);
     }
 
     @Override

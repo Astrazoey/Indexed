@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "indexed:vitalis"
+    ]
+  },
+  "criteria": {
+    "has_fragment": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:diamond"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "indexed:vitalis"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_fragment",
+      "has_the_recipe"
+    ]
+  ]
+}

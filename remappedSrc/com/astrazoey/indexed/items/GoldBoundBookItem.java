@@ -11,7 +11,7 @@ public class GoldBoundBookItem extends BookItem {
 
     @Override
     public int getEnchantability() {
-        return 100;
+        return 40;
     }
 
     @Override

@@ -1,19 +1,20 @@
 package com.astrazoey.indexed.mixins;
 
 import com.astrazoey.indexed.ConfigMain;
+import net.fabricmc.fabric.api.mininglevel.v1.MiningLevelManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tag.FluidTags;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolItem;
+import net.minecraft.registry.tag.FluidTags;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -41,6 +42,39 @@ public class PlayerEntityMixin {
     public int removeDeathXpCap(int oldCap) {
         return 10000;
     }
+
+
+    //Higher levels of silk touch
+    @Inject(method = "canHarvest", at = @At(value = "HEAD"), cancellable = true)
+    public void canHarvest(BlockState state, CallbackInfoReturnable<Boolean> cir) {
+
+        System.out.println("can harvest has run");
+
+        ItemStack itemStack = ((PlayerEntity) (Object) this).getInventory().getMainHandStack();
+        Item item = itemStack.getItem();
+        int miningLevel = -1;
+
+        int silkTouchLevel = EnchantmentHelper.getLevel(Enchantments.SILK_TOUCH, itemStack);
+
+        if(silkTouchLevel > 1) {
+            System.out.println("item has silk touch");
+            if(item instanceof ToolItem) {
+
+                System.out.println("mining level is before math: " + miningLevel);
+
+                miningLevel = ((ToolItem) item).getMaterial().getMiningLevel() + silkTouchLevel-1;
+
+                System.out.println("mining level is after math: " + miningLevel);
+
+                if(miningLevel >= MiningLevelManager.getRequiredMiningLevel(state)) {
+                    System.out.println("setting new return value");
+                    cir.setReturnValue(true);
+                }
+
+            }
+        }
+    }
+
 
 
 }

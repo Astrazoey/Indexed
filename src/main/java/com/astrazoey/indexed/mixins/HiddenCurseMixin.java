@@ -12,6 +12,7 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
@@ -79,19 +80,19 @@ class ElytraFeatureRendererMixin<T extends LivingEntity, M extends EntityModel<T
 @Mixin(ItemRenderer.class)
 class ItemRendererMixin {
 
-    public ThreadLocal<ModelTransformation.Mode> renderMode = new ThreadLocal<ModelTransformation.Mode>();
+    public ThreadLocal<ModelTransformationMode> renderMode = new ThreadLocal<ModelTransformationMode>();
 
 
-    @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V", at = @At(value = "HEAD"))
-    public void captureRenderMode(ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) {
+    @Inject(method = "Lnet/minecraft/client/render/item/ItemRenderer;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V", at = @At(value = "HEAD"))
+    public void captureRenderMode(ItemStack stack, ModelTransformationMode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) {
         this.renderMode.set(renderMode);
     }
 
-    @Redirect(method= "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isEmpty()Z"))
+    @Redirect(method= "Lnet/minecraft/client/render/item/ItemRenderer;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isEmpty()Z"))
     public boolean checkForHiddenCurse(ItemStack itemStack) {
         if(itemStack.isEmpty()) {
             return true;
-        } else if((EnchantmentHelper.getLevel(Indexed.HIDDEN_CURSE, itemStack) > 0 && (renderMode.get() != ModelTransformation.Mode.GROUND) && (renderMode.get() != ModelTransformation.Mode.GUI) && (renderMode.get() != ModelTransformation.Mode.FIXED))) {
+        } else if((EnchantmentHelper.getLevel(Indexed.HIDDEN_CURSE, itemStack) > 0 && (renderMode.get() != ModelTransformationMode.GROUND) && (renderMode.get() != ModelTransformationMode.GUI) && (renderMode.get() != ModelTransformationMode.FIXED))) {
             return true;
         } else {
             return false;

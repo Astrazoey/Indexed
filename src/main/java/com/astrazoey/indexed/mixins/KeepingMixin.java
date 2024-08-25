@@ -22,7 +22,7 @@ class ServerPlayerEntityMixin {
     @Inject(method="copyFrom", at = @At(value="RETURN"))
     public void keepItemsAfterDeath(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
         if(!alive) {
-            if(!oldPlayer.isSpectator() && !((ServerPlayerEntity) (Object) this).world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+            if(!oldPlayer.isSpectator() && !((ServerPlayerEntity) (Object) this).getWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
                 ((ServerPlayerEntity) (Object) this).getInventory().clone(oldPlayer.getInventory());
             }
         }

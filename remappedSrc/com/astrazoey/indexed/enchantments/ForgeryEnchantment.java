@@ -6,7 +6,7 @@ import net.minecraft.entity.EquipmentSlot;
 
 public class ForgeryEnchantment extends Enchantment {
     public ForgeryEnchantment() {
-        super(Enchantment.Rarity.COMMON, EnchantmentTarget.BREAKABLE, new EquipmentSlot[] {EquipmentSlot.MAINHAND});
+        super(Enchantment.Rarity.UNCOMMON, EnchantmentTarget.BREAKABLE, new EquipmentSlot[] {EquipmentSlot.MAINHAND});
     }
 
     @Override

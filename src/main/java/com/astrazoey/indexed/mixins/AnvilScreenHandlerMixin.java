@@ -3,12 +3,15 @@ package com.astrazoey.indexed.mixins;
 import com.astrazoey.indexed.EnchantingAcceptability;
 import com.astrazoey.indexed.Indexed;
 import com.astrazoey.indexed.MaxEnchantingSlots;
+import com.astrazoey.indexed.registry.IndexedItems;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.AnvilScreen;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingResultInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.AnvilScreenHandler;
@@ -20,7 +23,6 @@ import org.spongepowered.asm.mixin.injection.*;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -67,7 +69,7 @@ public class AnvilScreenHandlerMixin {
             enchantingFactor = enchantingFactor * MaxEnchantingSlots.getEnchantType(itemStack1).getRepairScaling();
 
             //Removes repair cost if forgery is enabled
-            enchantingFactor = enchantingFactor - (EnchantmentHelper.getLevel(Indexed.FORGERY, itemStack1) * 2 * MaxEnchantingSlots.getEnchantType(itemStack1).getRepairScaling());
+            enchantingFactor = enchantingFactor - (EnchantmentHelper.getLevel(Indexed.FORGERY, itemStack1) * 3 * MaxEnchantingSlots.getEnchantType(itemStack1).getRepairScaling());
             if(enchantingFactor < 0) {
                 enchantingFactor = 0;
             }
@@ -89,6 +91,7 @@ public class AnvilScreenHandlerMixin {
     }
 
 
+
     //Allow items to be used in the anvil for free
     @ModifyConstant(method= "updateResult", constant = @Constant(expandZeroConditions = {Constant.Condition.LESS_THAN_OR_EQUAL_TO_ZERO}, ordinal = 2))
     public int allowAnyCost(int i) {
@@ -106,6 +109,8 @@ public class AnvilScreenHandlerMixin {
         }
         return -1;
     }
+
+
 
     @Redirect(method="updateResult", at = @At(value="INVOKE", target="Lnet/minecraft/inventory/CraftingResultInventory;setStack(ILnet/minecraft/item/ItemStack;)V", ordinal=4))
     public void denyExpensiveTransactions(CraftingResultInventory craftingResultInventory, int slot, ItemStack stack) {
@@ -152,8 +157,14 @@ public class AnvilScreenHandlerMixin {
     public void grantRepairAdvancement(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
         System.out.println("Grant repair activated.");
         if(player instanceof ServerPlayerEntity) {
-            Indexed.REPAIR_ITEM.trigger((ServerPlayerEntity) player);
+            //Indexed.REPAIR_ITEM.trigger((ServerPlayerEntity) player);
         }
+    }
+
+    //Use universal repair item
+    @Redirect(method = "updateResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Item;canRepair(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z"))
+    public boolean repairable(Item instance, ItemStack stack, ItemStack ingredient) {
+        return stack.isDamageable() && ingredient.isOf(IndexedItems.VITALIS);
     }
 
 
@@ -172,19 +183,54 @@ class AnvilScreenMixin {
         return slot;
     }
 
-    //update text
-    @Redirect(method = "drawForeground", at = @At(value="INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;drawWithShadow(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/text/Text;FFI)I"))
-    public int setText(TextRenderer textRenderer, MatrixStack matrices, Text text, float x, float y, int color) {
 
-        if(MaxEnchantingSlots.getEnchantType(itemStack) != null) {
-            if(MaxEnchantingSlots.getEnchantType(itemStack).getMaxEnchantingSlots() < MaxEnchantingSlots.getCurrent(itemStack)) {
-                text = new TranslatableText("container.indexed.overcharged");
-                String textString = text.getString();
-                x = x + 100 - textRenderer.getWidth(textString);
+    //update text
+
+    @Redirect(method = "drawForeground", at = @At(value="INVOKE", target = "Lnet/minecraft/screen/AnvilScreenHandler;getLevelCost()I"))
+    public int checkOvercharge2(AnvilScreenHandler instance) {
+        ItemStack item = instance.getSlot(2).getStack();
+
+        //If overcharged
+        if(MaxEnchantingSlots.getEnchantType(item) != null) {
+            if(MaxEnchantingSlots.getEnchantType(item).getMaxEnchantingSlots() < MaxEnchantingSlots.getCurrent(item)) {
+                System.out.println("item is overcharged [2]");
+                return 1;
             }
         }
 
-        return textRenderer.drawWithShadow(matrices, (Text)text, (float)x, 69.0F, color);
+        return instance.getLevelCost();
+    }
+
+    @Redirect(method = "drawForeground", at = @At(value="INVOKE", target="Lnet/minecraft/screen/slot/Slot;hasStack()Z"))
+    public boolean checkOvercharge(Slot instance) {
+
+        ItemStack item = instance.getStack();
+
+        //If overcharged
+        if(MaxEnchantingSlots.getEnchantType(item) != null) {
+            if(MaxEnchantingSlots.getEnchantType(item).getMaxEnchantingSlots() < MaxEnchantingSlots.getCurrent(item)) {
+                System.out.println("item is overcharged");
+                return true;
+            }
+        }
+        return instance.hasStack();
+    }
+
+
+
+    //update text
+    @Redirect(method = "drawForeground", at = @At(value="INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)I"))
+    public int setText(DrawContext context, TextRenderer textRenderer, Text text, int mouseX, int mouseY, int color) {
+
+        if(MaxEnchantingSlots.getEnchantType(itemStack) != null) {
+            if(MaxEnchantingSlots.getEnchantType(itemStack).getMaxEnchantingSlots() < MaxEnchantingSlots.getCurrent(itemStack)) {
+                text = Text.translatable("container.indexed.overcharged");
+                String textString = text.getString();
+                mouseX = mouseX + 100 - textRenderer.getWidth(textString);
+            }
+        }
+
+        return context.drawTextWithShadow(textRenderer, text, mouseX, 69, color);
     }
 
 }
