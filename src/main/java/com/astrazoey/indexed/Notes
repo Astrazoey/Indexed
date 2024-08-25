@@ -1,3 +1,6 @@
+Important Notes
+
+Current Version: 1.20.4
 
 Key Points:
  1. Tiers come with a cap on how many enchantments it can have.
@@ -6,15 +9,19 @@ Key Points:
  4. Villagers no longer sell enchantments you can get from an enchanting table.
  5. Repairing costs zero experience when using materials, the amount of materials required scales with the amount of enchantments on the items.
 
-Changes:
+Main Changes:
  - Increased enchantments level to 5 for everything possible. Exception of Silk Touch, Channeling, Infinity, and Curses.
  - Removed mutually exclusive enchantments with the exception of Fortune + Silk Touch
  - Repair cost for repair materials is adjusted depending on the enchantment type and how enchanted the item is.
  - Repair cost costs no experience when using repair materials.
  - Vanilla repairing with experience is still possible by repairing with tools rather than repair materials.
  - There is now a level cap on tools depending on the tier. It's calculated by the number of total enchantments (including levels). The max count is preset.
+
+ Villagers:
  - Villagers can no longer sell enchanted books that are higher than level 3.
  - Villagers can only trade treasure, & curses. ie: Things you cannot get on an enchanting table.
+
+ Enchanting Table Rarity:
  - Mending is no longer considered a treasure and is a rare enchantment found in the enchanting table.
  - Silk Touch is now "RARE" instead of "VERY RARE".
  - Multishot is now "VERY RARE" instead of "RARE"
@@ -22,18 +29,23 @@ Changes:
  - Piercing is now "UNCOMMON" instead of "RARE"
  - Loyalty is now "RARE" instead of "UNCOMMON"
  - Impaling is now "UNCOMMON" instead of "RARE"
+
+ Balancing Enchantments:
  - Nerfed Quick Draw, Sharpness, Knockback, Punch, and Protection (to adjust for level 5 enchantments).
- - Added repair items to tools that don't normally have them (tridents, bows, crossbows, fishing rods, etc).
- - Config included which lets you set max enchantment caps and repair costs for items - including modded items.
+
+Enchantment Behavior Changes:
  - Riptide tridents can now be used when it's dry, but it will default to usual behavior.
  - Riptide is compatible with Loyalty. The Loyalty effect takes place in dry circumstances.
  - Riptide is compatible with channeling, so you can summon lightning on impact.
  - Riptide Tridents are thrown farther than usual (when used in dry contexts).
  - Impaling Tridents will now do extra damage to any mob that is touching rain or water.
+
+Misc Changes:
+ - Config included which lets you set max enchantment caps and repair costs for items - including modded items.
  - Experience retrieved on death is no longer capped at 7 levels.
  - Enchanted Books can now be found in various structures related to the enchantment. Eg: mining enchantments like fortune, silk touch can be found in Mineshafts
 
-New Stuff:
+New Enchantments:
  - New "Slow Burn" enchantment for the Elytra which slows down firework velocity but greatly increases their duration.
  - New "Quick Flight" enchantment for the Elytra which speeds up firework velocity but decreases their duration. This enchantment is disabled in the config by default.
  - New "Forgery" enchantment which decreases the repair cost for that tool.
@@ -43,20 +55,25 @@ New Stuff:
  - New "Gilded Book" that's crafted with gold and has extremely high enchantability compared to a regular book. It excludes common enchantments.
  - New "Essence" enchantment that only appears in loot on a gold bound book. This enchantment provides a lot of experience when used in a grindstone.
  - New "Debuff Resistance" enchantment which decreases the duration of negative status effects by 10 seconds per level.
+
+New Blocks:
  - New "Crystal Globe" block that that decrements enchantment levels.
  - When the Crystal Globe is fed enough levels and given an amethyst shard, it will grant the player the "Enchanted" status effect and some experience.
  - The Crystal Globe is more efficient when surrounded by amethyst clusters, but using the Globe can destroy the surrounding clusters.
+
+Other New Features:
  - New "Enchanted" status effect that boosts enchanting power by 1 level.
  - Repair items are removed entirely. They are replaced with a new item called "Vitalis" which can repair any item with durability.
 
 Planned:
- - //TODO: Curse of Deceit: Item lies about its durability. (or hides durability)
+ - //TODO: Add Curse of Deceit: Item lies about its durability. (or hides durability)
  - //TODO: "Reeling" enchantment for fishing rods which allows the line to be cast further.
  - //TODO: Nerf Fortune V
  - //TODO: Investigate Gold Bound Book's exclusion of common enchantments
- - //FIXME: Anvil allows Overcharged crafting when Charm's "AnvilImprovementsEnabled" set to true.
- - //FIXME: Keeping enchantment does nothing when Charm's "Totem of Preserving" set to true.
 
+BUGS:
+ - //BUG: Advancement criterion are messed up completely
+ - //BUG: Curse of mystery is broken
 
 Things to think about:
  - //Think: Fortune and Silk Touch are mutex
