@@ -1,0 +1,54 @@
+{
+  "parent": "indexed:story/repair_item",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:netherite_helmet"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.hidden_armor.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.hidden_armor.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_keeping": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:netherite_helmet",
+              "minecraft:netherite_chestplate",
+              "minecraft:netherite_leggings",
+              "minecraft:netherite_boots"
+            ],
+            "predicates": {
+              "minecraft:enchantments": [
+                {
+                  "enchantments": [
+                    "indexed:hidden_curse"
+                  ],
+                  "levels": 5
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_keeping"
+    ]
+  ],
+  "rewards": {
+    "experience": 200
+  }
+}

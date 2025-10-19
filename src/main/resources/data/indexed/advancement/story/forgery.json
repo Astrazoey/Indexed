@@ -1,0 +1,48 @@
+{
+  "parent": "indexed:story/repair_item",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:enchanted_book"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.forgery.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.forgery.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_forgery": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "predicates": {
+              "minecraft:enchantments": [
+                {
+                  "enchantments": [
+                    "indexed:forgery"
+                  ],
+                  "levels": {
+                    "min": 1,
+                    "max": 5
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_forgery"
+    ]
+  ]
+}

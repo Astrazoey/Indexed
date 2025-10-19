@@ -1,0 +1,48 @@
+{
+  "parent": "indexed:story/repair_item",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:enchanted_book"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.unbreakable.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.unbreakable.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "mending_and_unbreaking_v": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "predicates": {
+              "minecraft:enchantments": [
+                {
+                  "enchantments": ["minecraft:mending"],
+                  "levels": 5
+                },
+                {
+                  "enchantments": ["minecraft:unbreaking"],
+                  "levels": 5
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    ["mending_and_unbreaking_v"]
+  ],
+  "rewards": {
+    "experience": 200
+  }
+}

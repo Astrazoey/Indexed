@@ -1,49 +1,36 @@
-/*
 package com.astrazoey.indexed.criterion;
 
-import com.google.gson.JsonObject;
-import net.minecraft.advancement.criterion.AbstractCriterion;
-import net.minecraft.advancement.criterion.AbstractCriterionConditions;
-import net.minecraft.predicate.entity.AdvancementEntityPredicateDeserializer;
-import net.minecraft.predicate.entity.EntityPredicate;
+
+import com.mojang.serialization.Codec;
+import net.minecraft.advancement.criterion.*;
+import net.minecraft.predicate.entity.LootContextPredicate;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+
+import java.util.Optional;
 
 public class MultishotCrossbowCriterion extends AbstractCriterion<MultishotCrossbowCriterion.Conditions> {
 
-    static final Identifier ID = new Identifier("multishot_crossbow");
-
     @Override
-    public Identifier getId() {
-        return ID;
-    }
-
-    public MultishotCrossbowCriterion.Conditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended player, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
-        return new MultishotCrossbowCriterion.Conditions(player);
+    public Codec<Conditions> getConditionsCodec() {
+        return Conditions.CODEC;
     }
 
     public void trigger(ServerPlayerEntity player) {
-        this.trigger(player, (conditions) -> {
-            return conditions.matches(player);
-        });
+        trigger(player, Conditions::requirementsMet);
     }
 
+    public record Conditions(Optional<LootContextPredicate> playerPredicate) implements AbstractCriterion.Conditions {
+        public static Codec<MultishotCrossbowCriterion.Conditions> CODEC = LootContextPredicate.CODEC.optionalFieldOf("player")
+                .xmap(Conditions::new, Conditions::player).codec();
 
-    public static class Conditions extends AbstractCriterionConditions {
-
-        public Conditions(EntityPredicate.Extended player) {
-            super(MultishotCrossbowCriterion.ID, player);
+        @Override
+        public Optional<LootContextPredicate> player() {
+            return playerPredicate;
         }
 
-        public static MultishotCrossbowCriterion.Conditions create() {
-            return new MultishotCrossbowCriterion.Conditions(EntityPredicate.Extended.EMPTY);
-        }
-
-        public boolean matches(ServerPlayerEntity player) {
+        public boolean requirementsMet() {
             return true;
         }
     }
 }
 
-
- */

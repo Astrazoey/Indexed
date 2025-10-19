@@ -1,0 +1,38 @@
+{
+  "parent": "indexed:story/root",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "indexed:crystal_globe"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.get_crystal.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.get_crystal.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "get_crystal": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "indexed:crystal_globe"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "get_crystal"
+    ]
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "parent": "indexed:story/root",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "indexed:vitalis"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.repair_item.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.repair_item.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "repair_item": {
+      "trigger": "minecraft:repair_item"
+    }
+  },
+  "requirements": [
+    [
+      "repair_item"
+    ]
+  ]
+}

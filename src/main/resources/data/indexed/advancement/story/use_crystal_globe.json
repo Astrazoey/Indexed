@@ -1,0 +1,29 @@
+{
+  "parent": "indexed:story/get_crystal",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "indexed:crystal_globe"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.use_crystal_globe.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.use_crystal_globe.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "use_crystal_globe": {
+      "trigger": "minecraft:use_crystal_globe"
+    }
+  },
+  "requirements": [
+    [
+      "use_crystal_globe"
+    ]
+  ]
+}

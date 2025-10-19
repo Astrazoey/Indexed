@@ -2,38 +2,35 @@ package com.astrazoey.indexed.criterion;
 
 
 import com.mojang.serialization.Codec;
-import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.advancement.criterion.*;
-import net.minecraft.predicate.entity.LootContextPredicateValidator;
-public class RepairItemCriterion implements Criterion<RepairItemCriterion.Conditions> {
+import net.minecraft.predicate.entity.LootContextPredicate;
+import net.minecraft.server.network.ServerPlayerEntity;
 
-    public RepairItemCriterion() {
+import java.util.Optional;
 
+public class RepairItemCriterion extends AbstractCriterion<RepairItemCriterion.Conditions> {
+
+    @Override
+    public Codec<Conditions> getConditionsCodec() {
+        return Conditions.CODEC;
     }
 
-    public void beginTrackingCondition(PlayerAdvancementTracker manager, ConditionsContainer<RepairItemCriterion.Conditions> conditions) {
+    public void trigger(ServerPlayerEntity player) {
+        trigger(player, Conditions::requirementsMet);
     }
 
-    public void endTrackingCondition(PlayerAdvancementTracker manager, ConditionsContainer<RepairItemCriterion.Conditions> conditions) {
-    }
+    public record Conditions(Optional<LootContextPredicate> playerPredicate) implements AbstractCriterion.Conditions {
+        public static Codec<RepairItemCriterion.Conditions> CODEC = LootContextPredicate.CODEC.optionalFieldOf("player")
+                .xmap(Conditions::new, Conditions::player).codec();
 
-    public void endTracking(PlayerAdvancementTracker tracker) {
-    }
-
-    public Codec<RepairItemCriterion.Conditions> getConditionsCodec() {
-        return RepairItemCriterion.Conditions.CODEC;
-    }
-
-    public static record Conditions() implements CriterionConditions {
-        public static final Codec<RepairItemCriterion.Conditions> CODEC = Codec.unit(new RepairItemCriterion.Conditions());
-
-        public Conditions() {
+        @Override
+        public Optional<LootContextPredicate> player() {
+            return playerPredicate;
         }
 
-        public void validate(LootContextPredicateValidator validator) {
+        public boolean requirementsMet() {
+            return true;
         }
     }
-
-
 }
 

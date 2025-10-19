@@ -1,0 +1,29 @@
+{
+  "parent": "indexed:story/root",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:grindstone"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.grind_essence.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.grind_essence.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "grind_essence": {
+      "trigger": "minecraft:grind_essence"
+    }
+  },
+  "requirements": [
+    [
+      "grind_essence"
+    ]
+  ]
+}

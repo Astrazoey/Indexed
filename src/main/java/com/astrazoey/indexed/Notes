@@ -1,6 +1,6 @@
 Important Notes
 
-Current Version: 1.20.4
+Current Version: 1.21.10
 
 Key Points:
  1. Tiers come with a cap on how many enchantments it can have.
@@ -10,12 +10,13 @@ Key Points:
  5. Repairing costs zero experience when using materials, the amount of materials required scales with the amount of enchantments on the items.
 
 Main Changes:
- - Increased enchantments level to 5 for everything possible. Exception of Silk Touch, Channeling, Infinity, and Curses.
+ - Increased enchantments level to 5 for everything possible. Exception of Silk Touch, and Curses.
  - Removed mutually exclusive enchantments with the exception of Fortune + Silk Touch
  - Repair cost for repair materials is adjusted depending on the enchantment type and how enchanted the item is.
  - Repair cost costs no experience when using repair materials.
  - Vanilla repairing with experience is still possible by repairing with tools rather than repair materials.
  - There is now a level cap on tools depending on the tier. It's calculated by the number of total enchantments (including levels). The max count is preset.
+ - Enchantments in the anvil no longer require the same level to upgrade, and instead are a sum of the enchantments
 
  Villagers:
  - Villagers can no longer sell enchanted books that are higher than level 3.
@@ -31,7 +32,7 @@ Main Changes:
  - Impaling is now "UNCOMMON" instead of "RARE"
 
  Balancing Enchantments:
- - Nerfed Quick Draw, Sharpness, Knockback, Punch, and Protection (to adjust for level 5 enchantments).
+ - Nerfed Quick Draw, Sharpness, Knockback, Punch, Protection, and Fortune (to adjust for level 5 enchantments).
 
 Enchantment Behavior Changes:
  - Riptide tridents can now be used when it's dry, but it will default to usual behavior.
@@ -68,11 +69,8 @@ Other New Features:
 Planned:
  - //TODO: Add Curse of Deceit: Item lies about its durability. (or hides durability)
  - //TODO: "Reeling" enchantment for fishing rods which allows the line to be cast further.
- - //TODO: Nerf Fortune V
- - //TODO: Investigate Gold Bound Book's exclusion of common enchantments
 
 BUGS:
- - //BUG: Advancement criterion are messed up completely
  - //BUG: Curse of mystery is broken
 
 Things to think about:
@@ -80,10 +78,11 @@ Things to think about:
 
 
 Credit to Artists:
-  - Monke (Enchanted status effect and Gilded Book texture
+  - Monke (Enchanted status effect and Gilded Book texture)
   - Vectorwing (Crystal Globe model and texture)
 
 Thank you for the programming help:
  - Gegy
  - Cameron
  - Vectorwing
+ - BD

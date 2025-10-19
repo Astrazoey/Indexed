@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " g ",
+    "gBg",
+    " g "
+  ],
+  "key": {
+    "g": "minecraft:gold_ingot",
+    "B": "minecraft:book"
+  },
+  "result": {
+    "id": "indexed:gold_bound_book",
+    "count": 1
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "indexed:story/max_sharpness_and_smite",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:golden_sword"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.max_gold.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.max_gold.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "max_gold": {
+      "trigger": "minecraft:max_gold"
+    }
+  },
+  "requirements": [
+    [
+      "max_gold"
+    ]
+  ],
+  "rewards": {
+    "experience": 200
+  }
+}

@@ -1,48 +1,36 @@
-/*
 package com.astrazoey.indexed.criterion;
 
-import com.google.gson.JsonObject;
-import net.minecraft.advancement.criterion.AbstractCriterion;
-import net.minecraft.advancement.criterion.AbstractCriterionConditions;
-import net.minecraft.predicate.entity.AdvancementEntityPredicateDeserializer;
-import net.minecraft.predicate.entity.EntityPredicate;
+
+import com.mojang.serialization.Codec;
+import net.minecraft.advancement.criterion.*;
+import net.minecraft.predicate.entity.LootContextPredicate;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+
+import java.util.Optional;
 
 public class EnchantedCriterion extends AbstractCriterion<EnchantedCriterion.Conditions> {
 
-    static final Identifier ID = new Identifier("enchanted_advancement");
-
     @Override
-    public Identifier getId() {
-        return ID;
-    }
-
-    public EnchantedCriterion.Conditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended player, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
-        return new EnchantedCriterion.Conditions(player);
+    public Codec<Conditions> getConditionsCodec() {
+        return Conditions.CODEC;
     }
 
     public void trigger(ServerPlayerEntity player) {
-        this.trigger(player, (conditions) -> {
-            return conditions.matches(player);
-        });
+        trigger(player, Conditions::requirementsMet);
     }
 
+    public record Conditions(Optional<LootContextPredicate> playerPredicate) implements AbstractCriterion.Conditions {
+        public static Codec<EnchantedCriterion.Conditions> CODEC = LootContextPredicate.CODEC.optionalFieldOf("player")
+                .xmap(Conditions::new, Conditions::player).codec();
 
-    public static class Conditions extends AbstractCriterionConditions {
-
-        public Conditions(EntityPredicate.Extended player) {
-            super(EnchantedCriterion.ID, player);
+        @Override
+        public Optional<LootContextPredicate> player() {
+            return playerPredicate;
         }
 
-        public static EnchantedCriterion.Conditions create() {
-            return new EnchantedCriterion.Conditions(EntityPredicate.Extended.EMPTY);
-        }
-
-        public boolean matches(ServerPlayerEntity player) {
+        public boolean requirementsMet() {
             return true;
         }
     }
 }
 
- */

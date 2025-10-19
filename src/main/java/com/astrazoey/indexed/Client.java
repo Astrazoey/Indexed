@@ -32,7 +32,7 @@ public class Client implements ClientModInitializer {
 
          */
         //Load Indexed Config on Client
-        Identifier identifier = new Identifier(Indexed.MOD_ID);
+        Identifier identifier = Identifier.of(Indexed.MOD_ID);
         ClientLifecycleEvents.CLIENT_STARTED.register(identifier, callbacks -> {
             System.out.println("INDEXED: Client started. Loading config.");
             Indexed.initializeConfig();

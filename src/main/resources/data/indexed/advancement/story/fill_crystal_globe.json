@@ -1,0 +1,34 @@
+/*
+{
+  "parent": "indexed:story/use_crystal_globe",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:amethyst_cluster"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.fill_crystal_globe.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.fill_crystal_globe.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "fill_crystal_globe": {
+      "trigger": "minecraft:fill_crystal_globe"
+    }
+  },
+  "requirements": [
+    [
+      "fill_crystal_globe"
+    ]
+  ],
+  "rewards": {
+    "experience": 50
+  }
+}
+*/

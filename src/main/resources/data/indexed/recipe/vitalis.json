@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:diamond",
+    "minecraft:copper_ingot",
+    "minecraft:lapis_lazuli"
+  ],
+  "result": {
+    "id": "indexed:vitalis",
+    "count": 4
+  }
+}

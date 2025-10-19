@@ -3,14 +3,18 @@ package com.astrazoey.indexed.blocks;
 import com.astrazoey.indexed.Indexed;
 import com.astrazoey.indexed.registry.IndexedItems;
 import com.astrazoey.indexed.registry.IndexedParticles;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.block.*;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.EnchantmentTags;
+import net.minecraft.screen.GrindstoneScreenHandler;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtList;
@@ -84,49 +88,33 @@ public class CrystalGlobeBlock extends Block {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hitresult) {
+    public ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if((player.getStackInHand(hand).hasEnchantments() || player.getStackInHand(hand).isOf(Items.ENCHANTED_BOOK))) {
             ItemStack heldItem = player.getStackInHand(hand);
-            Map<Enchantment, Integer> enchantmentIntegerMap = EnchantmentHelper.get(heldItem);
-            Map<Enchantment, Integer> newEnchantingMap = EnchantmentHelper.get(heldItem);
-            newEnchantingMap.clear();
+            ItemEnchantmentsComponent heldEnchantments = EnchantmentHelper.getEnchantments(heldItem);
+            ItemEnchantmentsComponent.Builder newEnchantments = new ItemEnchantmentsComponent.Builder(EnchantmentHelper.getEnchantments(heldItem));
 
             int totalEnchants = 0;
+            for(Object2IntMap.Entry<RegistryEntry<Enchantment>> entry : heldEnchantments.getEnchantmentEntries()) {
+                RegistryEntry<Enchantment> enchantmentEntry = entry.getKey();
+                int enchantmentLevel = heldEnchantments.getLevel(enchantmentEntry);
 
-            for(Enchantment i : enchantmentIntegerMap.keySet()) {
-                int enchantmentLevel = enchantmentIntegerMap.get(i);
-
-                if(i.isCursed()) {
-                    newEnchantingMap.put(i,enchantmentLevel);
+                if(enchantmentEntry.isIn(EnchantmentTags.CURSE)) {
+                    newEnchantments.set(enchantmentEntry, enchantmentLevel);
                 } else {
                     enchantmentLevel--;
                     incrementCrystalLevel(state, world, pos);
                     totalEnchants++;
                 }
 
-                if(enchantmentLevel > 0) {
-                    newEnchantingMap.put(i,enchantmentLevel);
-                }
+
+                newEnchantments.set(enchantmentEntry, enchantmentLevel);
             }
 
-            EnchantmentHelper.set(newEnchantingMap, heldItem);
-            if(heldItem.isOf(Items.ENCHANTED_BOOK)) {
-                NbtList nbtList = EnchantedBookItem.getEnchantmentNbt(heldItem);
-                nbtList.clear();
-                for(Enchantment i : newEnchantingMap.keySet()) {
-                    Identifier identifier = EnchantmentHelper.getEnchantmentId(i);
-                    nbtList.add(EnchantmentHelper.createNbt(identifier, newEnchantingMap.get(i)));
-                    totalEnchants++;
-                }
-                heldItem.getOrCreateNbt().put("StoredEnchantments", nbtList);
-                if(heldItem.getNbt() != null) {
-                    if (heldItem.getNbt().getList("StoredEnchantments", 10).isEmpty()) {
-                        ItemStack newItem = Items.BOOK.getDefaultStack();
-                        newItem.setNbt(heldItem.getNbt());
-                        player.setStackInHand(hand, newItem);
-                    }
-                }
-
+            EnchantmentHelper.set(heldItem, newEnchantments.build());
+            if(heldItem.isOf(Items.ENCHANTED_BOOK) && EnchantmentHelper.getEnchantments(heldItem).isEmpty()) {
+                ItemStack newItem = heldItem.copyComponentsToNewStack(Items.BOOK, heldItem.getCount());
+                player.setStackInHand(hand, newItem);
             }
 
             if(totalEnchants > 0) {
@@ -140,20 +128,24 @@ public class CrystalGlobeBlock extends Block {
             world.playSound(null, pos, Indexed.CRYSTAL_HARVEST_SOUND_EVENT, SoundCategory.BLOCKS, 1f, getRandomPitch(world));
 
             world.setBlockState(pos, state.with(LEVEL, 0), Block.NOTIFY_ALL);
-            StatusEffectInstance statusEffectInstance = new StatusEffectInstance(Indexed.ENCHANTED_STATUS_EFFECT, 300*20);
-            player.addStatusEffect(statusEffectInstance);
+
+            if (!player.getEntityWorld().isClient()) {
+                StatusEffectInstance statusEffectInstance = new StatusEffectInstance(Indexed.ENCHANTED_STATUS_EFFECT, 300*20);
+                player.addStatusEffect(statusEffectInstance);
+            }
+
 
             if(world instanceof ServerWorld) {
                 this.dropExperience((ServerWorld) world, pos, getCrystalPower(world, pos));
             }
 
-            int finalClusterCount = countAmethystClusters(pos, world, true);
+            //int finalClusterCount = countAmethystClusters(pos, world, true);
 
             if(player instanceof ServerPlayerEntity) {
                 Indexed.USE_CRYSTAL_GLOBE.trigger((ServerPlayerEntity) player);
-                if(finalClusterCount >= MAX_LEVEL) {
-                    //Indexed.FILL_CRYSTAL_GLOBE.trigger((ServerPlayerEntity) player);
-                }
+                //if(finalClusterCount >= MAX_LEVEL) {
+                //    Indexed.FILL_CRYSTAL_GLOBE.trigger((ServerPlayerEntity) player);
+                //}
 
             }
 
@@ -180,7 +172,8 @@ public class CrystalGlobeBlock extends Block {
     }
 
     private int getCrystalPower(World world, BlockPos pos) {
-        return 25 + (Math.min(countAmethystClusters(pos, world, false),8)*3);
+        //return 25 + (Math.min(countAmethystClusters(pos, world, false),8)*3);
+        return 30;
     }
 
     private void incrementCrystalLevel(BlockState state, World world, BlockPos pos) {
@@ -189,8 +182,6 @@ public class CrystalGlobeBlock extends Block {
         if(i < MAX_LEVEL && (world.getRandom().nextInt(100)) <= getCrystalPower(world, pos) && !world.isClient()) {
             i++;
             world.setBlockState(pos, state.with(LEVEL, i), Block.NOTIFY_ALL);
-
-
         }
     }
 
@@ -262,11 +253,11 @@ public class CrystalGlobeBlock extends Block {
 
     public void randomDisplayTick(BlockState state, World world, BlockPos pos, net.minecraft.util.math.random.Random random) {
         if (random.nextInt(3) == 0 && state.get(LEVEL) >= MAX_LEVEL) {
-            world.addParticle(IndexedParticles.CRYSTAL_HARVEST, pos.getX() + world.getRandom().nextFloat()*1, pos.getY()+ world.getRandom().nextFloat()*1, pos.getZ()+ world.getRandom().nextFloat()*1, random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D);
+            world.addParticleClient(IndexedParticles.CRYSTAL_HARVEST, pos.getX() + world.getRandom().nextFloat()*1, pos.getY()+ world.getRandom().nextFloat()*1, pos.getZ()+ world.getRandom().nextFloat()*1, random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D);
         }
 
         if (random.nextInt(24) == 0 && state.get(LEVEL) >= MAX_LEVEL) {
-            world.playSound(pos.getX(), pos.getY(), pos.getZ(), Indexed.CRYSTAL_AMBIENT_SOUND_EVENT, SoundCategory.BLOCKS, 2f, getRandomPitch(world), true);
+            world.playSoundClient(pos.getX(), pos.getY(), pos.getZ(), Indexed.CRYSTAL_AMBIENT_SOUND_EVENT, SoundCategory.BLOCKS, 2f, getRandomPitch(world), true);
         }
 
     }
@@ -286,14 +277,15 @@ public class CrystalGlobeBlock extends Block {
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         return state.get(LEVEL);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState state, BlockView world, BlockPos pos, NavigationType type) {
+    public boolean canPathfindThrough(BlockState state, NavigationType type) {
         return false;
     }
+
 
     static {
         STATE_TO_LUMINANCE = (state) -> {

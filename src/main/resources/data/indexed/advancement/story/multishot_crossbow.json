@@ -1,0 +1,32 @@
+{
+  "parent": "indexed:story/root",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:crossbow"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.multishot_crossbow.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.multishot_crossbow.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "multishot_crossbow": {
+      "trigger": "minecraft:multishot_crossbow"
+    }
+  },
+  "requirements": [
+    [
+      "multishot_crossbow"
+    ]
+  ],
+  "rewards": {
+    "experience": 200
+  }
+}

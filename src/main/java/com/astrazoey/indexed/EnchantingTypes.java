@@ -1,5 +1,9 @@
 package com.astrazoey.indexed;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.effect.WitherStatusEffect;
+import net.minecraft.entity.mob.MobEntity;
+
 public class EnchantingTypes {
     public static final EnchantingType GENERIC;
 
@@ -11,12 +15,14 @@ public class EnchantingTypes {
     public static final EnchantingType WOOD_TIER;
     public static final EnchantingType LEATHER_TIER;
     public static final EnchantingType CHAINMAIL_TIER;
+    public static final EnchantingType COPPER_TIER;
 
     public static final EnchantingType FISHING_ROD;
     public static final EnchantingType CROSSBOW;
     public static final EnchantingType BOW;
     public static final EnchantingType TRIDENT;
     public static final EnchantingType TURTLE_HELMET;
+    public static final EnchantingType MACE;
 
     public static final EnchantingType ELYTRA;
     //public static final EnchantingType SHEARS;
@@ -57,13 +63,14 @@ public class EnchantingTypes {
         CHAINMAIL_TIER = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(14).repairScaling(0.5f));
         WOOD_TIER = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(16).repairScaling(0.25f));
         LEATHER_TIER = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(16).repairScaling(0.25f));
-
+        COPPER_TIER = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(12).repairScaling(0.25f));
 
         FISHING_ROD = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(8).repairScaling(0.2f));
         CROSSBOW = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(7).repairScaling(0.3f));
         BOW = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(8).repairScaling(0.4f));
         TRIDENT = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(8).repairScaling(0.5f));
         TURTLE_HELMET = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(15).repairScaling(0.5f));
+        MACE = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(11).repairScaling(0.5f));
 
         ELYTRA = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(6).repairScaling(1f));
         //SHEARS = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(5).repairScaling(0.2f));

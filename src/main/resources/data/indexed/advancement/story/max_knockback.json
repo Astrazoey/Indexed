@@ -1,0 +1,32 @@
+{
+  "parent": "indexed:story/max_sharpness_and_smite",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:stone_sword"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.max_knockback.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.max_knockback.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "max_knockback": {
+      "trigger": "minecraft:max_knockback"
+    }
+  },
+  "requirements": [
+    [
+      "max_knockback"
+    ]
+  ],
+  "rewards": {
+    "experience": 200
+  }
+}

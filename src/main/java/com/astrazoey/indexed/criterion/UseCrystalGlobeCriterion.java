@@ -2,53 +2,35 @@ package com.astrazoey.indexed.criterion;
 
 
 import com.mojang.serialization.Codec;
-import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.advancement.criterion.*;
-import net.minecraft.predicate.entity.LootContextPredicateValidator;
+import net.minecraft.predicate.entity.LootContextPredicate;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class UseCrystalGlobeCriterion implements Criterion<UseCrystalGlobeCriterion.Conditions> {
+import java.util.Optional;
 
-    public UseCrystalGlobeCriterion() {
+public class UseCrystalGlobeCriterion extends AbstractCriterion<UseCrystalGlobeCriterion.Conditions> {
 
+    @Override
+    public Codec<Conditions> getConditionsCodec() {
+        return Conditions.CODEC;
     }
 
     public void trigger(ServerPlayerEntity player) {
-
+        trigger(player, Conditions::requirementsMet);
     }
 
-    public void beginTrackingCondition(PlayerAdvancementTracker manager, ConditionsContainer<UseCrystalGlobeCriterion.Conditions> conditions) {
-    }
+    public record Conditions(Optional<LootContextPredicate> playerPredicate) implements AbstractCriterion.Conditions {
+        public static Codec<UseCrystalGlobeCriterion.Conditions> CODEC = LootContextPredicate.CODEC.optionalFieldOf("player")
+                .xmap(Conditions::new, Conditions::player).codec();
 
-    public void endTrackingCondition(PlayerAdvancementTracker manager, ConditionsContainer<UseCrystalGlobeCriterion.Conditions> conditions) {
-    }
-
-    public void endTracking(PlayerAdvancementTracker tracker) {
-    }
-
-    public Codec<UseCrystalGlobeCriterion.Conditions> getConditionsCodec() {
-        return UseCrystalGlobeCriterion.Conditions.CODEC;
-    }
-
-
-    public static record Conditions() implements CriterionConditions {
-        public static final Codec<UseCrystalGlobeCriterion.Conditions> CODEC = Codec.unit(new UseCrystalGlobeCriterion.Conditions());
-
-        public Conditions() {
+        @Override
+        public Optional<LootContextPredicate> player() {
+            return playerPredicate;
         }
 
-        public void validate(LootContextPredicateValidator validator) {
-        }
-
-        public boolean matches(ServerPlayerEntity player) {
+        public boolean requirementsMet() {
             return true;
         }
     }
-
-
-
-
-
-
 }
 

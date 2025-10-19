@@ -1,0 +1,9 @@
+{
+  "values": [
+    "indexed:debuff_resistance",
+    "indexed:slow_burn",
+    "indexed:quick_flight",
+    "indexed:forgery"
+  ],
+  "replace": false
+}

@@ -136,6 +136,11 @@ public final class TransformerMixinPlugin implements IMixinConfigPlugin {
         }
 
         @Override
+        public boolean couldTransformClass(MixinEnvironment environment, String s) {
+            return this.delegate.couldTransformClass(environment, s);
+        }
+
+        @Override
         public byte[] generateClass(MixinEnvironment environment, String name) {
             return this.delegate.generateClass(environment, name);
         }

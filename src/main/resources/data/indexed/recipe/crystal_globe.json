@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "aga",
+    "gdg",
+    "aia"
+  ],
+  "key": {
+    "g": "minecraft:glass",
+    "a": "minecraft:amethyst_shard",
+    "d": "minecraft:diamond",
+    "i": "minecraft:iron_ingot"
+  },
+  "result": {
+    "id": "indexed:crystal_globe"
+  }
+}

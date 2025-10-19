@@ -1,0 +1,29 @@
+{
+  "parent": "indexed:story/root",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "indexed:gold_bound_book"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.enchant_gold_book.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.enchant_gold_book.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "enchant_gold_book": {
+      "trigger": "minecraft:enchant_gold_book"
+    }
+  },
+  "requirements": [
+    [
+      "enchant_gold_book"
+    ]
+  ]
+}

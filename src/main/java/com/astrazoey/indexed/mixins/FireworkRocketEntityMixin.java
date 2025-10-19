@@ -2,8 +2,11 @@ package com.astrazoey.indexed.mixins;
 
 import com.astrazoey.indexed.Indexed;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,8 +35,11 @@ public class FireworkRocketEntityMixin {
         double b = 1.5d;
         double c = 0.5d;
 
-        double slowBurnLevel = EnchantmentHelper.getEquipmentLevel(Indexed.SLOW_BURN, this.shooter);
-        double quickBurnLevel = EnchantmentHelper.getEquipmentLevel(Indexed.QUICK_FLIGHT, this.shooter);
+        double slowBurnLevel = EnchantmentHelper.getEquipmentLevel(this.shooter.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(Indexed.SLOW_BURN), this.shooter);
+        double quickBurnLevel = EnchantmentHelper.getEquipmentLevel(this.shooter.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(Indexed.QUICK_FLIGHT), this.shooter);
+        //System.out.println("Slow burn level: " + slowBurnLevel);
+        //System.out.println("Quick burn level: " + quickBurnLevel);
+
         if(slowBurnLevel > 0) {
             slowBurnLevel++;
             a = a / (slowBurnLevel/ (1.75d + (quickBurnLevel * 0.3d)));

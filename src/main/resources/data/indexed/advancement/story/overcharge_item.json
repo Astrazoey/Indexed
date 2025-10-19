@@ -1,0 +1,32 @@
+{
+  "parent": "indexed:story/root",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:enchanting_table"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.overcharge.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.overcharge.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "overcharge_item": {
+      "trigger": "minecraft:overcharge_item"
+    }
+  },
+  "requirements": [
+    [
+      "overcharge_item"
+    ]
+  ],
+  "rewards": {
+    "experience": 200
+  }
+}

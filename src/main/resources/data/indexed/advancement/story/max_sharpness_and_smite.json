@@ -1,0 +1,50 @@
+{
+  "parent": "indexed:story/repair_item",
+  "display": {
+    "icon": {
+      "count": 1,
+      "id": "minecraft:netherite_sword"
+    },
+    "title": {
+      "translate": "advancements.indexed.story.max_sharpness_and_smite.title"
+    },
+    "description": {
+      "translate": "advancements.indexed.story.max_sharpness_and_smite.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "max_sharpness_and_smite": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "predicates": {
+              "minecraft:enchantments": [
+                {
+                  "enchantments": "minecraft:sharpness",
+                  "levels": 5
+                },
+                {
+                  "enchantments": "minecraft:smite",
+                  "levels": 5
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "max_sharpness_and_smite"
+    ]
+  ],
+  "rewards": {
+    "experience": 200
+  }
+}

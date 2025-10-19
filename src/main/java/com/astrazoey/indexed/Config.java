@@ -92,7 +92,7 @@ public class Config {
 
             //System.out.println("Found entry at " + i + ". It is called \"" + itemName + "\" and has " + maxSlots + " max slots and repair scaling of " + repairScale);
 
-            Identifier itemIdentifier = new Identifier(itemName);
+            Identifier itemIdentifier = Identifier.of(itemName);
             ThreadLocal<Identifier> localItemIdentifier = new ThreadLocal<Identifier>();
             localItemIdentifier.set(itemIdentifier);
 
@@ -198,6 +198,17 @@ public class Config {
         defaultConfig.put("minecraft:iron_leggings", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:iron_boots", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
 
+        //Copper
+        defaultConfig.put("minecraft:copper_sword", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:copper_pickaxe", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:copper_axe", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:copper_hoe", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:copper_shovel", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:copper_helmet", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:copper_chestplate", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:copper_leggings", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:copper_boots", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
+
         //Stone
         defaultConfig.put("minecraft:stone_sword", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:stone_pickaxe", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
@@ -230,6 +241,7 @@ public class Config {
         defaultConfig.put("minecraft:bow", EnchantingTypes.BOW.getEnchantabilityConfig());
         defaultConfig.put("minecraft:trident", EnchantingTypes.TRIDENT.getEnchantabilityConfig());
         defaultConfig.put("minecraft:turtle_helmet", EnchantingTypes.TURTLE_HELMET.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:mace", EnchantingTypes.MACE.getEnchantabilityConfig());
 
         //Other
         defaultConfig.put("minecraft:elytra", EnchantingTypes.ELYTRA.getEnchantabilityConfig());
@@ -238,7 +250,7 @@ public class Config {
         defaultConfig.put("minecraft:shield", EnchantingTypes.SHIELD.getEnchantabilityConfig());
         defaultConfig.put("minecraft:carrot_on_a_stick", EnchantingTypes.GENERIC.getEnchantabilityConfig());
         defaultConfig.put("minecraft:warped_fungus_on_a_stick", EnchantingTypes.GENERIC.getEnchantabilityConfig());
-
+        defaultConfig.put("minecraft:brush", EnchantingTypes.GENERIC.getEnchantabilityConfig());
 
 
         /*

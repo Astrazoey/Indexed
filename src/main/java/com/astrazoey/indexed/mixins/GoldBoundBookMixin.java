@@ -31,10 +31,12 @@ class GoldBoundBookEnchantmentMixin {
 
     @Redirect(method = "getPossibleEntries", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isOf(Lnet/minecraft/item/Item;)Z"))
     private static boolean allowBookItem(ItemStack itemStack, Item item) {
+
+
         return itemStack.isOf(Items.BOOK) || itemStack.isOf(IndexedItems.GOLD_BOUND_BOOK);
     }
 
-    @Redirect(method = "enchant", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isOf(Lnet/minecraft/item/Item;)Z"))
+    @Redirect(method = "enchant(Lnet/minecraft/util/math/random/Random;Lnet/minecraft/item/ItemStack;ILjava/util/stream/Stream;)Lnet/minecraft/item/ItemStack;", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isOf(Lnet/minecraft/item/Item;)Z"))
     private static boolean allowBookItem2(ItemStack itemStack, Item item) {
         return itemStack.isOf(Items.BOOK) || itemStack.isOf(IndexedItems.GOLD_BOUND_BOOK);
     }
