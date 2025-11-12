@@ -2,8 +2,7 @@
   "values": [
     "indexed:debuff_resistance",
     "indexed:slow_burn",
-    "indexed:quick_flight",
-    "indexed:forgery"
+    "indexed:quick_flight"
   ],
   "replace": false
 }

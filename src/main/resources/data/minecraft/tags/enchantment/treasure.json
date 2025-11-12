@@ -3,7 +3,8 @@
     "indexed:essence",
     "indexed:mystery_curse",
     "indexed:hidden_curse",
-    "indexed:keeping"
+    "indexed:keeping",
+    "indexed:forgery"
   ],
   "replace": false
 }

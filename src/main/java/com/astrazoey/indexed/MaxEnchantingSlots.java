@@ -37,6 +37,7 @@ public interface MaxEnchantingSlots {
 
     static int getCurrent(ItemStack itemStack) {
         if(itemStack != null) {
+            System.out.println("current enchanting slots is " + ((MaxEnchantingSlots) itemStack.getItem()).getEnchantingSlots(itemStack));
             return ((MaxEnchantingSlots) itemStack.getItem()).getEnchantingSlots(itemStack);
         } else {
             return 0;

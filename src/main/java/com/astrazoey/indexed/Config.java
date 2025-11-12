@@ -259,8 +259,8 @@ public class Config {
 
 
         //Mattock
-        EnchantabilityConfig mattockConfig = new EnchantabilityConfig(5, 1.0f);
-        defaultConfig.put("unitool:mattock", mattockConfig);
+        EnchantabilityConfig mattockConfig = new EnchantabilityConfig(7, 1.0f);
+        defaultConfig.put("mattock:mattock", mattockConfig);
 
         //Carve Your Pumpkin
         defaultConfig.put("carvepump:wooden_carver", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());

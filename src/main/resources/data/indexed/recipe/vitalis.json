@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    "minecraft:diamond",
+    "minecraft:amethyst_shard",
     "minecraft:copper_ingot",
     "minecraft:lapis_lazuli"
   ],

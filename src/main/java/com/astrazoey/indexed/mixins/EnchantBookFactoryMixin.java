@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class EnchantBookFactoryMixin {
     @Redirect(method = "create", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/Enchantment;getMaxLevel()I"))
     public int updateMaxEnchantment(Enchantment enchantment) {
-        if(enchantment.getMaxLevel() > 3 && ConfigMain.enableVillagerNerfs) {
-            return 3;
+        if(enchantment.getMaxLevel() > 2 && ConfigMain.enableVillagerNerfs) {
+            return 2;
         } else {
             return enchantment.getMaxLevel();
         }

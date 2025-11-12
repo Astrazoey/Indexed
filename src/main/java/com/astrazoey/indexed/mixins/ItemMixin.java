@@ -20,6 +20,8 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.EnchantmentTags;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -70,7 +72,11 @@ public abstract class ItemMixin implements MaxEnchantingSlots {
         int totalLevels = 0;
 
         for(var enchantmentEntry : itemEnchantments.getEnchantmentEntries()) {
-            totalLevels += enchantmentEntry.getIntValue();
+            if(enchantmentEntry.getKey().isIn(EnchantmentTags.CURSE)) {
+                totalLevels -= enchantmentEntry.getIntValue();
+            } else {
+                totalLevels += enchantmentEntry.getIntValue();
+            }
         }
 
         usedEnchantingSlots = totalLevels;

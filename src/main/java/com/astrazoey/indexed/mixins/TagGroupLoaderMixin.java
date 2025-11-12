@@ -29,11 +29,11 @@ public class TagGroupLoaderMixin {
                                 entriesToRemove.add(entry);
                             }
                             break;
-                        case "minecraft:mending":
-                            if (!ConfigMain.mendingIsTreasure) {
-                                entriesToRemove.add(entry);
-                            }
-                            break;
+//                        case "minecraft:mending":
+//                            if (!ConfigMain.mendingIsTreasure) {
+//                                entriesToRemove.add(entry);
+//                            }
+//                            break;
                     }
                 }
             }
