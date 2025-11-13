@@ -10,6 +10,7 @@
     "DamageLivingEntityMixin",
     "ColorSpecialMixin",
     "DebuffResistanceMixin",
+    "DeceitCurseMixin",
     "EnchantBookFactoryMixin",
     "EnchantmentHelperMixin",
     "EnchantmentMixin",
@@ -36,6 +37,7 @@
   "client": [
     "AnvilScreenMixin",
     "ArmorFeatureRendererMixin",
+    "DeceitCurseClientMixin",
     "ElytraFeatureRendererMixin",
     "ItemRendererMixin"
   ],

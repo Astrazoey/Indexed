@@ -20,6 +20,8 @@
   "enchantment.indexed.mystery_curse": "Curse of Mystery",
   "enchantment.indexed.mystery_curse.desc": "It is a mystery",
   "enchantment.indexed.mystery_tooltip": "Curse of Mystery",
+  "enchantment.indexed.curse_of_deceit": "Curse of Deceit",
+  "enchantment.indexed.curse_of_deceit.desc": "Item lies about its durability",
   "advancements.indexed.story.root.title": "Indexed",
   "advancements.indexed.story.root.description": "Enchanting done differently",
   "advancements.indexed.story.overcharge.title": "Overcharged!",
