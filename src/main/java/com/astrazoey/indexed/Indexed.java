@@ -115,6 +115,7 @@ public class Indexed implements ModInitializer {
     public static ComponentType<EnchantmentValueEffect> REDUCE_REPAIR_COST = registerEnchantment("reduce_repair_cost", builder -> builder.codec(EnchantmentValueEffect.CODEC));
     public static ComponentType<Unit> HIDE_ARMOR = registerEnchantment("hide_armor", builder -> builder.codec(Unit.CODEC));
     public static ComponentType<Unit> HIDE_ENCHANTMENTS = registerEnchantment("hide_enchantments", builder -> builder.codec(Unit.CODEC));
+    public static ComponentType<Unit> HIDE_DURABILITY = registerEnchantment("hide_durability", builder -> builder.codec(Unit.CODEC));
 
     //Blocks
     public static final Block CRYSTAL_GLOBE = new CrystalGlobeBlock(Block.Settings.create().

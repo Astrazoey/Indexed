@@ -1,7 +1,8 @@
 {
   "values": [
     "indexed:mystery_curse",
-    "indexed:hidden_curse"
+    "indexed:hidden_curse",
+    "indexed:curse_of_deceit"
   ],
   "replace": false
 }
