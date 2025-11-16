@@ -21,4 +21,12 @@ public class EnchantabilityConfig {
         this.repairScaling=repairScaling;
     }
 
+    public int getMaxEnchantingSlots() {
+        return maxEnchantingSlots;
+    }
+
+    public float getRepairScaling() {
+        return repairScaling;
+    }
+
 }

@@ -1,11 +1,7 @@
 package com.astrazoey.indexed.mixins;
 
-import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.EnchantmentLevelBasedValue;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.enchantment.effect.AllOfEnchantmentEffects;
-import net.minecraft.enchantment.effect.entity.IgniteEnchantmentEffect;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.registry.RegistryKeys;
 import org.spongepowered.asm.mixin.Mixin;

@@ -3,7 +3,6 @@ package com.astrazoey.indexed.mixins;
 import com.astrazoey.indexed.SetOreExperience;
 import net.minecraft.block.ExperienceDroppingBlock;
 import net.minecraft.util.math.intprovider.IntProvider;
-import net.minecraft.util.math.intprovider.UniformIntProvider;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;

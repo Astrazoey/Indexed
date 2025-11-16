@@ -3,8 +3,6 @@ package com.astrazoey.indexed.mixins;
 import com.astrazoey.indexed.Indexed;
 import com.astrazoey.indexed.MaxEnchantingSlots;
 import com.astrazoey.indexed.registry.IndexedItems;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.AnvilScreen;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
@@ -18,13 +16,11 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.ForgingSlotsManager;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -32,17 +28,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = AnvilScreenHandler.class, priority = 999)
 public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
 
+    @Unique
     ItemStack itemStack1;
+    @Unique
     ItemStack itemStack3;
 
-    int enchantLevel1;
+    @Unique
     int enchantLevel2;
 
+    @Unique
     boolean overcharged = false;
 
     //minimum amount of materials to repair an unenchanted tool
+    @Unique
     int repairCost = 1;
     //how much repairing scales with number of enchantments. higher values = higher costs for more enchanted items
+    @Unique
     int repairScaling = 6;
 
     public AnvilScreenHandlerMixin(@Nullable ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, ForgingSlotsManager forgingSlotsManager) {
@@ -65,6 +66,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
 
 
     //Change the amount of materials required for repair
+    @Unique
     public int calculateRepairCost() {
         if(MaxEnchantingSlots.getEnchantType(itemStack1) != null) {
             float enchantingRatio = (float) MaxEnchantingSlots.getCurrent(itemStack1) / (float) MaxEnchantingSlots.getEnchantType(itemStack1).getMaxEnchantingSlots();
@@ -98,15 +100,12 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
     // Allow enchantments to add linearly
     @Redirect(method = "updateResult", at = @At(value="INVOKE", target = "Ljava/lang/Math;max(II)I", ordinal = 0))
     public int linearEnchantment(int a, int b) {
-        //System.out.println("Calculating enchantment output!");
-        //System.out.println("First item level is " + a + " and second item level is " + b);
         return a + b;
     }
 
     @Redirect(method = "updateResult", at = @At(value="INVOKE", target = "Lnet/minecraft/component/type/ItemEnchantmentsComponent$Builder;getLevel(Lnet/minecraft/registry/entry/RegistryEntry;)I"))
     public int getQ(ItemEnchantmentsComponent.Builder instance, RegistryEntry<Enchantment> enchantment) {
         enchantLevel2 = instance.getLevel(enchantment);
-        //System.out.println("first enchant 2 is " + enchantLevel2);
         return enchantLevel2;
     }
 
@@ -114,18 +113,6 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
     public int linearEnchantmentSameValue(int q) {
         return enchantLevel2;
     }
-
-//    @ModifyVariable(method = "updateResult", at = @At(value = "STORE"), ordinal = 2, name = "r")
-//    private int forceRBranchFalse(int r) {
-//        if(r > 0 && r <= 5) {
-//            System.out.println("R is " + r);
-//            return enchantLevel1 + enchantLevel2;
-//        }
-//        return r;
-//    }
-
-
-
 
     //Allow items to be used in the anvil for free
     @ModifyConstant(method= "updateResult", constant = @Constant(expandZeroConditions = {Constant.Condition.LESS_THAN_OR_EQUAL_TO_ZERO}, ordinal = 2))
@@ -167,11 +154,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
     //Remove "Too Expensive!" stuff by keeping the repair cost of the item under 31.
     @Redirect(method = "updateResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;set(Lnet/minecraft/component/ComponentType;Ljava/lang/Object;)Ljava/lang/Object;", ordinal = 1))
     public <T> Object removeTooExpensiveLimit(ItemStack itemStack, ComponentType<T> type, T repairCost) {
-        if((int)repairCost > 30) {
-            itemStack.set(DataComponentTypes.REPAIR_COST, 30);
-        } else {
-            itemStack.set(DataComponentTypes.REPAIR_COST, (int)repairCost);
-        }
+        itemStack.set(DataComponentTypes.REPAIR_COST, Math.min((int)repairCost, 30));
         return null;
     }
 
@@ -181,18 +164,13 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
             property.set(0);
         } else {
             int maxRepairCost = 30 - Indexed.getEnchantmentValue(Indexed.REDUCE_REPAIR_COST, player.getEntityWorld(), itemStack1) * 5;
-            if(value > maxRepairCost) {
-                property.set(maxRepairCost);
-            } else {
-                property.set(value);
-            }
+            property.set(Math.min(value, maxRepairCost));
         }
     }
 
     @Inject(method="onTakeOutput", at = @At(value = "INVOKE", target = "Lnet/minecraft/inventory/Inventory;getStack(I)Lnet/minecraft/item/ItemStack;"))
     public void grantRepairAdvancement(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
         if(player instanceof ServerPlayerEntity) {
-            System.out.println("Grant repair activated.");
             Indexed.REPAIR_ITEM.trigger((ServerPlayerEntity) player);
         }
     }
@@ -207,67 +185,3 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler {
 
 }
 
-@Mixin(value = AnvilScreen.class, priority = 999)
-class AnvilScreenMixin {
-
-    ItemStack itemStack;
-
-
-
-    //get item stack
-    @Redirect(method = "drawForeground", at = @At(value="INVOKE", target = "Lnet/minecraft/screen/AnvilScreenHandler;getSlot(I)Lnet/minecraft/screen/slot/Slot;"))
-    public Slot getItemStack(AnvilScreenHandler anvilScreenHandler, int index) {
-        Slot slot = anvilScreenHandler.getSlot(index);
-        itemStack = slot.getStack();
-        return slot;
-    }
-
-
-    //update text
-
-    @Redirect(method = "drawForeground", at = @At(value="INVOKE", target = "Lnet/minecraft/screen/AnvilScreenHandler;getLevelCost()I"))
-    public int checkOvercharge2(AnvilScreenHandler instance) {
-        ItemStack item = instance.getSlot(2).getStack();
-
-        //If overcharged
-        if(MaxEnchantingSlots.getEnchantType(item) != null) {
-            if(MaxEnchantingSlots.getEnchantType(item).getMaxEnchantingSlots() < MaxEnchantingSlots.getCurrent(item)) {
-                return 1;
-            }
-        }
-
-        return instance.getLevelCost();
-    }
-
-    @Redirect(method = "drawForeground", at = @At(value="INVOKE", target="Lnet/minecraft/screen/slot/Slot;hasStack()Z"))
-    public boolean checkOvercharge(Slot instance) {
-
-        ItemStack item = instance.getStack();
-
-        //If overcharged
-        if(MaxEnchantingSlots.getEnchantType(item) != null) {
-            if(MaxEnchantingSlots.getEnchantType(item).getMaxEnchantingSlots() < MaxEnchantingSlots.getCurrent(item)) {
-                return true;
-            }
-        }
-        return instance.hasStack();
-    }
-
-
-
-    //update text
-    @Redirect(method = "drawForeground", at = @At(value="INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V"))
-    public void setText(DrawContext context, TextRenderer textRenderer, Text text, int mouseX, int mouseY, int color) {
-
-        if(MaxEnchantingSlots.getEnchantType(itemStack) != null) {
-            if(MaxEnchantingSlots.getEnchantType(itemStack).getMaxEnchantingSlots() < MaxEnchantingSlots.getCurrent(itemStack)) {
-                text = Text.translatable("container.indexed.overcharged");
-                String textString = text.getString();
-                mouseX = mouseX + 100 - textRenderer.getWidth(textString);
-            }
-        }
-
-        context.drawTextWithShadow(textRenderer, text, mouseX, 69, color);
-    }
-
-}

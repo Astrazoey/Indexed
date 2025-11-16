@@ -10,7 +10,7 @@
   ],
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/indexed",
-    "sources": "https://github.com/ZoeyTheEgoist/Indexed"
+    "sources": "https://github.com/Astrazoey/Indexed"
   },
 
   "license": "MIT",
@@ -22,11 +22,17 @@
       "com.astrazoey.indexed.Indexed"
     ],
     "client": [
-      "com.astrazoey.indexed.Client"
+      "com.astrazoey.indexed.IndexedClient"
     ]
   },
   "mixins": [
-    "indexed.mixins.json"
+    "indexed.mixins.json",
+
+    {
+      "config": "indexed.client.mixins.json",
+      "environment": "client"
+    }
+
   ],
 
   "depends": {

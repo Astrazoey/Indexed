@@ -6,9 +6,10 @@ Features:
 https://docs.google.com/document/d/1f7wjObfWQ-TKBCKmIQ-pBanj4WJUK1iDdEXRRcXeJIk/edit?tab=t.0
 
 Planned:
- - //TODO: Add Curse of Deceit: Item lies about its durability. (or hides durability)
- - //TODO: "Reeling" enchantment for fishing rods which allows the line to be cast further
- - //TODO: Make Keeping 100% chance to keep but damages durability
+ - //TODO: Add Rose Gold compat
+ - //TODO: Enchanted book cloning (printing press?) (nearby bookshelves?)
+ - //TODO: Think about the bookshelf structure
+ - //TODO: Considering changing the enchanting table handler
 
 Things to think about:
  - //Think: Fortune and Silk Touch are mutex

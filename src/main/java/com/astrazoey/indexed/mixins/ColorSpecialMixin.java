@@ -3,7 +3,6 @@ package com.astrazoey.indexed.mixins;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.EnchantmentTags;
-import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -20,8 +19,8 @@ public class ColorSpecialMixin {
     private static void colorSpecialEnchantments(RegistryEntry<Enchantment> enchantment, int level, CallbackInfoReturnable<Text> cir) {
 
 
-        if ((level == 1 && ((Enchantment) enchantment.value()).getMaxLevel() == 1) && (!enchantment.isIn(EnchantmentTags.CURSE))) {
-            MutableText mutableText = ((Enchantment) enchantment.value()).description().copy();
+        if ((level == 1 && enchantment.value().getMaxLevel() == 1) && (!enchantment.isIn(EnchantmentTags.CURSE))) {
+            MutableText mutableText = enchantment.value().description().copy();
             Texts.setStyleIfAbsent(mutableText, Style.EMPTY.withColor(Formatting.DARK_GREEN));
             cir.setReturnValue(mutableText);
         }

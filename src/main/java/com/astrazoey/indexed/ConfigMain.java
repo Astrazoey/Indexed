@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public class ConfigMain {
 
-    private static final float MOD_VERSION = 1.6f;
+    private static final float MOD_VERSION = 1.7f;
 
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("indexed.properties");
 
@@ -27,11 +27,12 @@ public class ConfigMain {
     public static final String ENABLE_VILLAGER_NERFS_KEY = "enable-villager-nerfs";
     public static boolean enableVillagerNerfs = true;
 
-    public static final String ENABLE_QUICK_FLIGHT_KEY = "enable-quick-flight-enchantment";
-    public static boolean enableQuickFlight = false;
+    public static final String ENABLE_LINEAR_XP = "enable-linear-xp";
+    public static boolean enableLinearXp = true;
 
-    public static final String MENDING_IS_TREASURE_KEY = "mending-is-treasure";
-    public static boolean mendingIsTreasure = false;
+    private static final String LINEAR_XP_AMOUNT = "linear-xp-amount";
+    private static final int linearXpAmountDefault = 30;
+    public static int linearXpAmount = linearXpAmountDefault;
 
     public static void save() {
         Properties props = new Properties();
@@ -98,8 +99,8 @@ public class ConfigMain {
         props.setProperty(ENABLE_CONFIG_UPDATES_KEY, String.valueOf(enableConfigUpdates));
         props.setProperty(ENABLE_ENCHANTMENT_NERFS_KEY, String.valueOf(enableEnchantmentNerfs));
         props.setProperty(ENABLE_VILLAGER_NERFS_KEY, String.valueOf(enableVillagerNerfs));
-        props.setProperty(ENABLE_QUICK_FLIGHT_KEY, String.valueOf(enableQuickFlight));
-        props.setProperty(MENDING_IS_TREASURE_KEY, String.valueOf(mendingIsTreasure));
+        props.setProperty(ENABLE_LINEAR_XP, String.valueOf(enableLinearXp));
+        props.setProperty(LINEAR_XP_AMOUNT, String.valueOf(linearXpAmount));
     }
 
     public static void assign(Properties props) {
@@ -107,8 +108,8 @@ public class ConfigMain {
         enableConfigUpdates = defaultBoolean(props.getProperty(ENABLE_CONFIG_UPDATES_KEY), true);
         enableEnchantmentNerfs = defaultBoolean(props.getProperty(ENABLE_ENCHANTMENT_NERFS_KEY), true);
         enableVillagerNerfs = defaultBoolean(props.getProperty(ENABLE_VILLAGER_NERFS_KEY), true);
-        enableQuickFlight = defaultBoolean(props.getProperty(ENABLE_QUICK_FLIGHT_KEY), false);
-        mendingIsTreasure = defaultBoolean(props.getProperty(MENDING_IS_TREASURE_KEY), false);
+        enableLinearXp = defaultBoolean(props.getProperty(ENABLE_LINEAR_XP), true);
+        linearXpAmount = defaultInt(props.getProperty(LINEAR_XP_AMOUNT), linearXpAmountDefault);
     }
 
     private static boolean defaultBoolean(String bool, boolean defaultOption) {
@@ -117,6 +118,10 @@ public class ConfigMain {
 
     private static float defaultFloat(String amount, float defaultOption) {
         return amount == null ? defaultOption : Float.parseFloat(amount);
+    }
+
+    private static int defaultInt(String amount, int defaultOption) {
+        return amount == null ? defaultOption : Integer.parseInt(amount);
     }
 
 }

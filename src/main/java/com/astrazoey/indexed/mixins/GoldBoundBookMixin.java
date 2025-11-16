@@ -1,6 +1,5 @@
 package com.astrazoey.indexed.mixins;
 
-import com.astrazoey.indexed.Indexed;
 import com.astrazoey.indexed.registry.IndexedItems;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.Item;

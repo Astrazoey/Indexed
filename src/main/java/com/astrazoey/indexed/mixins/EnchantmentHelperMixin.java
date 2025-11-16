@@ -4,7 +4,6 @@ import com.astrazoey.indexed.Indexed;
 import com.astrazoey.indexed.MaxEnchantingSlots;
 import com.astrazoey.indexed.registry.IndexedItems;
 import com.google.common.collect.Lists;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.advancement.criterion.EnchantedItemCriterion;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -13,8 +12,6 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.EnchantmentScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -29,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static java.lang.Math.min;
@@ -62,19 +58,11 @@ public class EnchantmentHelperMixin {
 
         int infinityLevel = Indexed.getEnchantmentValue(Indexed.REPLENISH_PROJECTILE, world, rangedWeaponStack);
 
-        System.out.println("infinity level is " + infinityLevel);
-
         double infinityChance = 0.5d + (infinityLevel * 0.1d);
-
-        System.out.println("infinity chance is + " + infinityChance);
 
         double randomNumber = Math.random();
 
-        System.out.println("random number is " + randomNumber);
-
-
         if(infinityChance > randomNumber && infinityLevel > 0) {
-            System.out.println("infinity triggered");
             cir.setReturnValue(0);
         }
     }
@@ -99,11 +87,6 @@ public class EnchantmentHelperMixin {
                 maxLevel = 1;
             }
 
-//            // Get Silk Touch I only in the table
-//            else if(enchantmentx.matchesKey(Enchantments.SILK_TOUCH)) {
-//                maxLevel = 1;
-//            }
-
             // Get Unbreaking III only in the table
             else if(enchantmentx.matchesKey(Enchantments.UNBREAKING)) {
                 maxLevel = 3;
@@ -114,10 +97,6 @@ public class EnchantmentHelperMixin {
                 maxLevel = 2;
             }
 
-//            // Get Keeping II only in the table
-//            else if(enchantment.effects().contains(Indexed.KEEP_ITEMS)) {
-//                maxLevel = 2;
-//            }
 
 
 
@@ -133,18 +112,12 @@ public class EnchantmentHelperMixin {
         cir.setReturnValue(returnList);
     }
 
+
+    //Exclude unbreaking from Gold Bound Book enchantments
     @Unique
     private static boolean doStuff(RegistryEntry<Enchantment> enchantment, ItemStack stack) {
         if(stack.isOf(IndexedItems.GOLD_BOUND_BOOK)) {
-//            if(enchantment.value().getWeight() >= 10) {
-//                System.out.println("Excluded enchantment: " + enchantment);
-//                return false;
-//            }
-            if(enchantment.value().effects().contains(Indexed.REDUCE_REPAIR_COST) ||
-                enchantment.matchesKey(Enchantments.UNBREAKING) ||
-                    enchantment.matchesKey(Enchantments.MENDING)
-            ) {
-                System.out.println("Excluded enchantment: " + enchantment);
+            if(enchantment.matchesKey(Enchantments.UNBREAKING)) {
                 return false;
             }
         }
@@ -157,6 +130,7 @@ public class EnchantmentHelperMixin {
 @Mixin(EnchantmentScreenHandler.class)
 class TakeEnchantment {
 
+    @Unique
     ThreadLocal<Integer> effectLevel = new ThreadLocal<Integer>();
 
     //Grant Gold Book Enchantment
@@ -194,18 +168,6 @@ class TakeEnchantment {
             instance.addEnchantment(enchantment, level);
         }
     }
-
-    /*
-    @Redirect(method="method_17410", at = @At(value="INVOKE", target = "Lnet/minecraft/item/EnchantedBookItem;addEnchantment(Lnet/minecraft/item/ItemStack;Lnet/minecraft/enchantment/EnchantmentLevelEntry;)V"))
-    public void enchantedStatusEffectBook(ItemStack stack, EnchantmentLevelEntry entry) {
-        if(effectLevel != null) {
-            EnchantmentLevelEntry newEntry = new EnchantmentLevelEntry(entry.enchantment, min(entry.level + effectLevel.get(), entry.enchantment.getMaxLevel()));
-            EnchantedBookItem.addEnchantment(stack, newEntry);
-        } else {
-            EnchantedBookItem.addEnchantment(stack, entry);
-        }
-    }
-     */
 
     //Grant Overcharged Advancement
     @Redirect(method = "method_17410", at = @At(value="INVOKE", target = "Lnet/minecraft/advancement/criterion/EnchantedItemCriterion;trigger(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/item/ItemStack;I)V"))

@@ -1,13 +1,11 @@
 package com.astrazoey.indexed;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 
 public interface MaxEnchantingSlots {
-
-
 
     @Deprecated
     static void setMax(Item item, int amount) {
@@ -35,9 +33,9 @@ public interface MaxEnchantingSlots {
         }
     }
 
+
     static int getCurrent(ItemStack itemStack) {
         if(itemStack != null) {
-            System.out.println("current enchanting slots is " + ((MaxEnchantingSlots) itemStack.getItem()).getEnchantingSlots(itemStack));
             return ((MaxEnchantingSlots) itemStack.getItem()).getEnchantingSlots(itemStack);
         } else {
             return 0;

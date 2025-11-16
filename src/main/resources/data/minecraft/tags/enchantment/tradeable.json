@@ -1,7 +1,5 @@
 {
   "values": [
-    "indexed:mystery_curse",
-    "indexed:hidden_curse",
     "indexed:forgery"
   ],
   "replace": false

@@ -3,20 +3,20 @@ package com.astrazoey.indexed;
 
 import com.astrazoey.indexed.blocks.CrystalGlobeBlock;
 import com.astrazoey.indexed.criterion.*;
-//import com.astrazoey.indexed.mixins.CriterionRegistryAccessor;
 import com.astrazoey.indexed.mixins.EnchantmentMixin;
+import com.astrazoey.indexed.network.ConfigS2CPayload;
 import com.astrazoey.indexed.registry.IndexedItems;
 import com.astrazoey.indexed.registry.IndexedParticles;
 import com.astrazoey.indexed.status_effects.EnchantedStatusEffect;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.fabricmc.fabric.api.item.v1.EnchantmentEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-//import net.fabricmc.fabric.api.object.builder.v1.advancement.CriterionRegistry;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
-import net.fabricmc.fabric.impl.tag.convention.v2.TagRegistration;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.mixin.item.EnchantmentBuilderAccessor;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
@@ -25,7 +25,6 @@ import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.EnchantableComponent;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentLevelBasedValue;
@@ -35,12 +34,8 @@ import net.minecraft.enchantment.effect.EnchantmentEffectEntry;
 import net.minecraft.enchantment.effect.EnchantmentValueEffect;
 import net.minecraft.enchantment.effect.entity.IgniteEnchantmentEffect;
 import net.minecraft.enchantment.effect.value.AddEnchantmentEffect;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.item.*;
@@ -57,20 +52,17 @@ import net.minecraft.registry.*;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.tag.DamageTypeTags;
-import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.registry.tag.EntityTypeTags;
-import net.minecraft.registry.tag.TagGroupLoader;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Unit;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.registry.Registry;
 import net.minecraft.world.World;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.util.*;
@@ -78,8 +70,6 @@ import java.util.function.UnaryOperator;
 
 
 public class Indexed implements ModInitializer {
-
-    public static final Identifier CONFIG_PACKET = Identifier.of("indexed", "config");
 
     public static final String MOD_ID = "indexed";
 
@@ -102,19 +92,11 @@ public class Indexed implements ModInitializer {
     }
 
 
-    public static final RegistryKey<Enchantment> SLOW_BURN = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("slow_burn"));
-    public static final RegistryKey<Enchantment> QUICK_FLIGHT = RegistryKey.of(RegistryKeys.ENCHANTMENT, id("quick_flight"));
-    public static ComponentType<List<EnchantmentEffectEntry<EnchantmentValueEffect>>> DEBUFF_REDUCTION = registerEnchantment("debuff_reduction", builder ->
-            builder.codec(EnchantmentEffectEntry.createCodec(EnchantmentValueEffect.CODEC, LootContextTypes.ENCHANTED_DAMAGE).listOf()));
     public static ComponentType<List<EnchantmentEffectEntry<EnchantmentValueEffect>>> REPLENISH_PROJECTILE = registerEnchantment("replenish_projectile", builder ->
-            builder.codec(EnchantmentEffectEntry.createCodec(EnchantmentValueEffect.CODEC, LootContextTypes.ENCHANTED_ITEM).listOf()));
-    public static ComponentType<List<EnchantmentEffectEntry<EnchantmentValueEffect>>> KEEP_ITEMS = registerEnchantment("keep_items", builder ->
             builder.codec(EnchantmentEffectEntry.createCodec(EnchantmentValueEffect.CODEC, LootContextTypes.ENCHANTED_ITEM).listOf()));
     public static ComponentType<List<EnchantmentEffectEntry<EnchantmentValueEffect>>> ESSENCE = registerEnchantment("essence", builder ->
             builder.codec(EnchantmentEffectEntry.createCodec(EnchantmentValueEffect.CODEC, LootContextTypes.ENCHANTED_ITEM).listOf()));
     public static ComponentType<EnchantmentValueEffect> REDUCE_REPAIR_COST = registerEnchantment("reduce_repair_cost", builder -> builder.codec(EnchantmentValueEffect.CODEC));
-    public static ComponentType<Unit> HIDE_ARMOR = registerEnchantment("hide_armor", builder -> builder.codec(Unit.CODEC));
-    public static ComponentType<Unit> HIDE_ENCHANTMENTS = registerEnchantment("hide_enchantments", builder -> builder.codec(Unit.CODEC));
 
     //Blocks
     public static final Block CRYSTAL_GLOBE = new CrystalGlobeBlock(Block.Settings.create().
@@ -157,12 +139,10 @@ public class Indexed implements ModInitializer {
     public static OverchargeItemCriterion OVERCHARGE_ITEM = Criteria.register("overcharge_item", new OverchargeItemCriterion());
     public static EnchantGoldBookCriterion ENCHANT_GOLD_BOOK = Criteria.register("enchant_gold_book", new EnchantGoldBookCriterion());
     public static final RepairItemCriterion REPAIR_ITEM = Criteria.register("repair_item", new RepairItemCriterion());
-    public static GrindEssenceCriterion GRIND_ESSENCE = Criteria.register("grind_essence", new GrindEssenceCriterion());
     public static MultishotCrossbowCriterion MULTISHOT_CROSSBOW = Criteria.register("multishot_crossbow", new MultishotCrossbowCriterion());
     public static MaxGoldCriterion MAX_GOLD = Criteria.register("max_gold", new MaxGoldCriterion());
     public static MaxKnockbackCriterion MAX_KNOCKBACK = Criteria.register("max_knockback", new MaxKnockbackCriterion());
     public static final UseCrystalGlobeCriterion USE_CRYSTAL_GLOBE = Criteria.register("use_crystal_globe", new UseCrystalGlobeCriterion());
-    //public static final FillCrystalGlobeCriterion FILL_CRYSTAL_GLOBE = Criteria.register("fill_crystal_globe", new FillCrystalGlobeCriterion());
     public static EnchantedCriterion ENCHANTED_ADVANCEMENT = Criteria.register("enchanted_advancement", new EnchantedCriterion());
 
 
@@ -184,8 +164,36 @@ public class Indexed implements ModInitializer {
         Registry.register(Registries.SOUND_EVENT, CRYSTAL_HARVEST_SOUND, CRYSTAL_HARVEST_SOUND_EVENT);
         Registry.register(Registries.SOUND_EVENT, CRYSTAL_AMBIENT_SOUND, CRYSTAL_AMBIENT_SOUND_EVENT);
 
+
         //Particles
         IndexedParticles.init();
+
+
+        //Registers Config
+        Identifier identifier = Identifier.of(MOD_ID);
+        ServerLifecycleEvents.SERVER_STARTING.register(identifier, callbacks -> {
+            System.out.println("INDEXED: Server starting. Loading config.");
+            initializeConfig();
+        });
+
+        ServerLifecycleEvents.START_DATA_PACK_RELOAD.register(identifier, (server, serverResourceManager) -> {
+            System.out.println("INDEXED: Server data pack reload. Loading config.");
+            initializeConfig();
+        });
+
+
+        // Send Config to Players
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            ServerPlayerEntity player = handler.player;
+
+            System.out.println("INDEXED: Server player join. Sending config to player.");
+
+            ConfigS2CPayload activePayload = new ConfigS2CPayload(Config.getConfigList());
+            ServerPlayNetworking.send(player, activePayload);
+
+        });
+
+        PayloadTypeRegistry.playS2C().register(ConfigS2CPayload.ID, ConfigS2CPayload.CODEC);
 
         //Ores Drop Experience
         SetOreExperience.set(Blocks.COPPER_ORE, UniformIntProvider.create(1,3));
@@ -194,6 +202,7 @@ public class Indexed implements ModInitializer {
         SetOreExperience.set(Blocks.DEEPSLATE_IRON_ORE, UniformIntProvider.create(1,3));
         SetOreExperience.set(Blocks.GOLD_ORE, UniformIntProvider.create(2,4));
         SetOreExperience.set(Blocks.DEEPSLATE_GOLD_ORE, UniformIntProvider.create(2,4));
+
 
 
         //Add Items to Chests
@@ -335,6 +344,7 @@ public class Indexed implements ModInitializer {
                             new AddEnchantmentEffect(EnchantmentLevelBasedValue.linear(1.0F, 0.4F)),
                             Optional.empty()));
                 }
+
                 builder.exclusiveSet(RegistryEntryList.of());
             }
         });
@@ -980,17 +990,7 @@ public class Indexed implements ModInitializer {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(entries -> entries.addAfter(Items.BOOK,IndexedItems.GOLD_BOUND_BOOK));
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> entries.addAfter(Items.ENCHANTING_TABLE, Indexed.CRYSTAL_GLOBE));
 
-        //Registers Config
-        Identifier identifier = Identifier.of(MOD_ID);
-        ServerLifecycleEvents.SERVER_STARTING.register(identifier, callbacks -> {
-            System.out.println("INDEXED: Starting starting. Loading config.");
-            initializeConfig();
-        });
 
-        ServerLifecycleEvents.START_DATA_PACK_RELOAD.register(identifier, (server, serverResourceManager) -> {
-            System.out.println("INDEXED: Server data pack reload. Loading config.");
-            initializeConfig();
-        });
 
     }
 

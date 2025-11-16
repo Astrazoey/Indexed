@@ -27,7 +27,9 @@ public class Config {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static LinkedHashMap<String, EnchantabilityConfig> configList;
 
-
+    public static LinkedHashMap<String, EnchantabilityConfig> getConfigList() {
+        return configList;
+    }
 
     public static void save() {
         Properties props = new Properties();
@@ -477,6 +479,8 @@ public class Config {
         defaultConfig.put("valley:rg_shovel", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
         defaultConfig.put("valley:rg_hoe", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
         defaultConfig.put("valley:rg_pickaxe", EnchantingTypes.ROSE_GOLD_TIER.getEnchantabilityConfig());
+
+
 
         defaultConfig.put("valley:wood_knife", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());
         defaultConfig.put("valley:stone_knife", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
