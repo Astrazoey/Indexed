@@ -34,6 +34,9 @@ public class ConfigMain {
     private static final int linearXpAmountDefault = 30;
     public static int linearXpAmount = linearXpAmountDefault;
 
+    private static final String ENABLE_OVERCHARGE = "enable-overenchanting";
+    public static boolean enableOvercharge = true;
+
     public static void save() {
         Properties props = new Properties();
         read(props);
@@ -101,6 +104,7 @@ public class ConfigMain {
         props.setProperty(ENABLE_VILLAGER_NERFS_KEY, String.valueOf(enableVillagerNerfs));
         props.setProperty(ENABLE_LINEAR_XP, String.valueOf(enableLinearXp));
         props.setProperty(LINEAR_XP_AMOUNT, String.valueOf(linearXpAmount));
+        props.setProperty(ENABLE_OVERCHARGE, String.valueOf(enableOvercharge));
     }
 
     public static void assign(Properties props) {
@@ -110,6 +114,7 @@ public class ConfigMain {
         enableVillagerNerfs = defaultBoolean(props.getProperty(ENABLE_VILLAGER_NERFS_KEY), true);
         enableLinearXp = defaultBoolean(props.getProperty(ENABLE_LINEAR_XP), true);
         linearXpAmount = defaultInt(props.getProperty(LINEAR_XP_AMOUNT), linearXpAmountDefault);
+        enableOvercharge = defaultBoolean(props.getProperty(ENABLE_OVERCHARGE), true);
     }
 
     private static boolean defaultBoolean(String bool, boolean defaultOption) {
