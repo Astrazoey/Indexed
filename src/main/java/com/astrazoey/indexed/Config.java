@@ -166,6 +166,7 @@ public class Config {
         defaultConfig.put("minecraft:netherite_chestplate", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:netherite_leggings", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:netherite_boots", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:netherite_spear", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
 
         //Diamond
         defaultConfig.put("minecraft:diamond_sword", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
@@ -177,6 +178,7 @@ public class Config {
         defaultConfig.put("minecraft:diamond_chestplate", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:diamond_leggings", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:diamond_boots", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:diamond_spear", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
 
         //Gold
         defaultConfig.put("minecraft:golden_sword", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
@@ -188,6 +190,7 @@ public class Config {
         defaultConfig.put("minecraft:golden_chestplate", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:golden_leggings", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:golden_boots", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:golden_spear", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
 
         //Iron
         defaultConfig.put("minecraft:iron_sword", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
@@ -199,6 +202,7 @@ public class Config {
         defaultConfig.put("minecraft:iron_chestplate", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:iron_leggings", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:iron_boots", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:iron_spear", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
 
         //Copper
         defaultConfig.put("minecraft:copper_sword", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
@@ -210,6 +214,7 @@ public class Config {
         defaultConfig.put("minecraft:copper_chestplate", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:copper_leggings", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:copper_boots", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:copper_spear", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
 
         //Stone
         defaultConfig.put("minecraft:stone_sword", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
@@ -217,6 +222,7 @@ public class Config {
         defaultConfig.put("minecraft:stone_axe", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:stone_hoe", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:stone_shovel", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:stone_spear", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
 
         //Wood
         defaultConfig.put("minecraft:wooden_sword", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());
@@ -224,6 +230,7 @@ public class Config {
         defaultConfig.put("minecraft:wooden_axe", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:wooden_hoe", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:wooden_shovel", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:wooden_spear", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());
 
         //Chainmail
         defaultConfig.put("minecraft:chainmail_helmet", EnchantingTypes.CHAINMAIL_TIER.getEnchantabilityConfig());

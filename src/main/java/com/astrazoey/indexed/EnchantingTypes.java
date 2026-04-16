@@ -25,8 +25,8 @@ public class EnchantingTypes {
     public static final EnchantingType MACE;
 
     public static final EnchantingType ELYTRA;
-    //public static final EnchantingType SHEARS;
-    //public static final EnchantingType FLINT_AND_STEEL;
+    public static final EnchantingType SHEARS;
+    public static final EnchantingType FLINT_AND_STEEL;
     public static final EnchantingType SHIELD;
 
     //Modded Types
@@ -73,8 +73,8 @@ public class EnchantingTypes {
         MACE = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(14).repairScaling(0.5f));
 
         ELYTRA = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(8).repairScaling(1f));
-        //SHEARS = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(5).repairScaling(0.2f));
-        //FLINT_AND_STEEL = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(5).repairScaling(0.2f));
+        SHEARS = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(5).repairScaling(0.2f));
+        FLINT_AND_STEEL = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(5).repairScaling(0.2f));
         SHIELD = new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(7).repairScaling(0.2f));
 
         //Modded Support
