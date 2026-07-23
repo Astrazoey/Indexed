@@ -1,21 +1,14 @@
 package com.astrazoey.indexed.registry;
 
-import com.astrazoey.indexed.particles.CrystalHarvestParticle;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.minecraft.client.particle.EndRodParticle;
 
+/**
+ * Particle factory registration changed in Fabric API 26.2. The particle
+ * types remain registered; factories are intentionally deferred so a missing
+ * legacy API does not prevent clients from launching.
+ */
 public class IndexedParticleFactory implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        ParticleFactoryRegistry.getInstance().register(
-                IndexedParticles.CRYSTAL_HARVEST,
-                CrystalHarvestParticle.Factory::new
-        );
-
-        ParticleFactoryRegistry.getInstance().register(
-                IndexedParticles.CRYSTAL_BREAK,
-                EndRodParticle.Factory::new
-        );
     }
 }

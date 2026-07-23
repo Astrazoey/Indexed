@@ -1,11 +1,11 @@
 package com.astrazoey.indexed.status_effects;
 
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectCategory;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 
-public class EnchantedStatusEffect extends StatusEffect {
+public class EnchantedStatusEffect extends MobEffect {
 
-    public EnchantedStatusEffect(StatusEffectCategory category, int color) {
+    public EnchantedStatusEffect(MobEffectCategory category, int color) {
         super(category, color);
     }
 }

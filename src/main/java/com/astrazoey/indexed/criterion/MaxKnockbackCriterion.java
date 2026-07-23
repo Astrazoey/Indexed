@@ -2,29 +2,29 @@ package com.astrazoey.indexed.criterion;
 
 
 import com.mojang.serialization.Codec;
-import net.minecraft.advancement.criterion.*;
-import net.minecraft.predicate.entity.LootContextPredicate;
-import net.minecraft.server.network.ServerPlayerEntity;
-
+import net.minecraft.advancements.triggers.*;
+import net.minecraft.advancements.predicates.ContextAwarePredicate;
+import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
+import net.minecraft.server.level.ServerPlayer;
 import java.util.Optional;
 
-public class MaxKnockbackCriterion extends AbstractCriterion<MaxKnockbackCriterion.Conditions> {
+public class MaxKnockbackCriterion extends SimpleCriterionTrigger<MaxKnockbackCriterion.Conditions> {
 
     @Override
-    public Codec<Conditions> getConditionsCodec() {
+    public Codec<Conditions> codec() {
         return Conditions.CODEC;
     }
 
-    public void trigger(ServerPlayerEntity player) {
+    public void trigger(ServerPlayer player) {
         trigger(player, Conditions::requirementsMet);
     }
 
-    public record Conditions(Optional<LootContextPredicate> playerPredicate) implements AbstractCriterion.Conditions {
-        public static Codec<MaxKnockbackCriterion.Conditions> CODEC = LootContextPredicate.CODEC.optionalFieldOf("player")
+    public record Conditions(Optional<ContextAwarePredicate> playerPredicate) implements SimpleCriterionTrigger.SimpleInstance {
+        public static Codec<MaxKnockbackCriterion.Conditions> CODEC = ContextAwarePredicate.CODEC.optionalFieldOf("player")
                 .xmap(Conditions::new, Conditions::player).codec();
 
         @Override
-        public Optional<LootContextPredicate> player() {
+        public Optional<ContextAwarePredicate> player() {
             return playerPredicate;
         }
 

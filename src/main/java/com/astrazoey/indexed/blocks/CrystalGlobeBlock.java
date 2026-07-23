@@ -4,41 +4,38 @@ import com.astrazoey.indexed.Indexed;
 import com.astrazoey.indexed.registry.IndexedItems;
 import com.astrazoey.indexed.registry.IndexedParticles;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.minecraft.block.*;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.EnchantmentTags;
-import net.minecraft.screen.GrindstoneScreenHandler;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.ai.pathing.NavigationType;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.stat.Stats;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.EnchantmentTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -49,22 +46,22 @@ import java.util.function.ToIntFunction;
 public class CrystalGlobeBlock extends Block {
 
     public static final int MAX_LEVEL = 8;
-    public static final IntProperty LEVEL = Properties.LEVEL_8;
+    public static final IntegerProperty LEVEL = BlockStateProperties.LEVEL_COMPOSTER;
     public static final ToIntFunction<BlockState> STATE_TO_LUMINANCE;
 
-    public CrystalGlobeBlock(AbstractBlock.Settings settings) {
+    public CrystalGlobeBlock(BlockBehaviour.Properties settings) {
         super(settings);
-        this.setDefaultState((BlockState)this.stateManager.getDefaultState().with(LEVEL, 0));
+        this.registerDefaultState((BlockState)this.stateDefinition.any().setValue(LEVEL, 0));
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext context) {
 
-        VoxelShape base = VoxelShapes.cuboid(0.125f, 0f, 0.125f, 0.875f, 0.125f, 0.875f);
-        VoxelShape stand = VoxelShapes.cuboid(0.375f, 0.125f, 0.375f, 0.625f, 0.25f, 0.625);
-        VoxelShape head = VoxelShapes.cuboid(0.1875f, 0.25f, 0.1875f, 0.8125f, 0.875f, 0.8125f);
+        VoxelShape base = Shapes.box(0.125f, 0f, 0.125f, 0.875f, 0.125f, 0.875f);
+        VoxelShape stand = Shapes.box(0.375f, 0.125f, 0.375f, 0.625f, 0.25f, 0.625);
+        VoxelShape head = Shapes.box(0.1875f, 0.25f, 0.1875f, 0.8125f, 0.875f, 0.8125f);
 
-        return VoxelShapes.union(head, VoxelShapes.union(base, stand));
+        return Shapes.or(head, Shapes.or(base, stand));
     }
 
 
@@ -73,33 +70,33 @@ public class CrystalGlobeBlock extends Block {
         return start + alpha * (finish - start);
     }
 
-    private Vec3d lerpVector(Vec3d start, Vec3d finish, double alpha) {
-        return new Vec3d(
+    private Vec3 lerpVector(Vec3 start, Vec3 finish, double alpha) {
+        return new Vec3(
                 lerpDouble(start.x, finish.x, alpha),
                 lerpDouble(start.y, finish.y, alpha),
                 lerpDouble(start.z, finish.z, alpha));
     }
 
-    private void crystalUseEffects(BlockState state, World world, BlockPos pos) {
-        world.playSound(null, pos, Indexed.CRYSTAL_USE_SOUND_EVENT, SoundCategory.BLOCKS, 0.2f, getRandomPitch(world));
-        if(world instanceof ServerWorld) {
-            ((ServerWorld) world).spawnParticles(IndexedParticles.CRYSTAL_BREAK, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, 20, 0.25, 0.25, 0.25, 0);
+    private void crystalUseEffects(BlockState state, Level world, BlockPos pos) {
+        world.playSound(null, pos, Indexed.CRYSTAL_USE_SOUND_EVENT, SoundSource.BLOCKS, 0.2f, getRandomPitch(world));
+        if(world instanceof ServerLevel) {
+            ((ServerLevel) world).sendParticles(IndexedParticles.CRYSTAL_BREAK, pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5, 20, 0.25, 0.25, 0.25, 0);
         }
     }
 
     @Override
-    public ActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if((player.getStackInHand(hand).hasEnchantments() || player.getStackInHand(hand).isOf(Items.ENCHANTED_BOOK))) {
-            ItemStack heldItem = player.getStackInHand(hand);
-            ItemEnchantmentsComponent heldEnchantments = EnchantmentHelper.getEnchantments(heldItem);
-            ItemEnchantmentsComponent.Builder newEnchantments = new ItemEnchantmentsComponent.Builder(EnchantmentHelper.getEnchantments(heldItem));
+    public InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if((player.getItemInHand(hand).isEnchanted() || player.getItemInHand(hand).is(Items.ENCHANTED_BOOK))) {
+            ItemStack heldItem = player.getItemInHand(hand);
+            ItemEnchantments heldEnchantments = EnchantmentHelper.getEnchantmentsForCrafting(heldItem);
+            ItemEnchantments.Mutable newEnchantments = new ItemEnchantments.Mutable(EnchantmentHelper.getEnchantmentsForCrafting(heldItem));
 
             int totalEnchants = 0;
-            for(Object2IntMap.Entry<RegistryEntry<Enchantment>> entry : heldEnchantments.getEnchantmentEntries()) {
-                RegistryEntry<Enchantment> enchantmentEntry = entry.getKey();
+            for(Object2IntMap.Entry<Holder<Enchantment>> entry : heldEnchantments.entrySet()) {
+                Holder<Enchantment> enchantmentEntry = entry.getKey();
                 int enchantmentLevel = heldEnchantments.getLevel(enchantmentEntry);
 
-                if(enchantmentEntry.isIn(EnchantmentTags.CURSE)) {
+                if(enchantmentEntry.is(EnchantmentTags.CURSE)) {
                     newEnchantments.set(enchantmentEntry, enchantmentLevel);
                 } else {
                     enchantmentLevel--;
@@ -111,38 +108,38 @@ public class CrystalGlobeBlock extends Block {
                 newEnchantments.set(enchantmentEntry, enchantmentLevel);
             }
 
-            EnchantmentHelper.set(heldItem, newEnchantments.build());
-            if(heldItem.isOf(Items.ENCHANTED_BOOK) && EnchantmentHelper.getEnchantments(heldItem).isEmpty()) {
-                ItemStack newItem = heldItem.copyComponentsToNewStack(Items.BOOK, heldItem.getCount());
-                player.setStackInHand(hand, newItem);
+            EnchantmentHelper.setEnchantments(heldItem, newEnchantments.toImmutable());
+            if(heldItem.is(Items.ENCHANTED_BOOK) && EnchantmentHelper.getEnchantmentsForCrafting(heldItem).isEmpty()) {
+                ItemStack newItem = heldItem.transmuteCopy(Items.BOOK, heldItem.getCount());
+                player.setItemInHand(hand, newItem);
             }
 
             if(totalEnchants > 0) {
                 crystalUseEffects(state, world, pos);
 
-                return ActionResult.SUCCESS;
+                return InteractionResult.SUCCESS;
             } else {
-                return ActionResult.FAIL;
+                return InteractionResult.FAIL;
             }
-        } else if(player.getMainHandStack().isEmpty() && state.get(LEVEL) >= MAX_LEVEL) {
-            world.playSound(null, pos, Indexed.CRYSTAL_HARVEST_SOUND_EVENT, SoundCategory.BLOCKS, 1f, getRandomPitch(world));
+        } else if(player.getMainHandItem().isEmpty() && state.getValue(LEVEL) >= MAX_LEVEL) {
+            world.playSound(null, pos, Indexed.CRYSTAL_HARVEST_SOUND_EVENT, SoundSource.BLOCKS, 1f, getRandomPitch(world));
 
-            world.setBlockState(pos, state.with(LEVEL, 0), Block.NOTIFY_ALL);
+            world.setBlock(pos, state.setValue(LEVEL, 0), Block.UPDATE_ALL);
 
-            if (!player.getEntityWorld().isClient()) {
-                StatusEffectInstance statusEffectInstance = new StatusEffectInstance(Indexed.ENCHANTED_STATUS_EFFECT, 300*20);
-                player.addStatusEffect(statusEffectInstance);
+            if (!player.level().isClientSide()) {
+                MobEffectInstance statusEffectInstance = new MobEffectInstance(Indexed.ENCHANTED_STATUS_EFFECT, 300*20);
+                player.addEffect(statusEffectInstance);
             }
 
 
-            if(world instanceof ServerWorld) {
-                this.dropExperience((ServerWorld) world, pos, getCrystalPower(world, pos));
+            if(world instanceof ServerLevel) {
+                this.popExperience((ServerLevel) world, pos, getCrystalPower(world, pos));
             }
 
             //int finalClusterCount = countAmethystClusters(pos, world, true);
 
-            if(player instanceof ServerPlayerEntity) {
-                Indexed.USE_CRYSTAL_GLOBE.trigger((ServerPlayerEntity) player);
+            if(player instanceof ServerPlayer) {
+                Indexed.USE_CRYSTAL_GLOBE.trigger((ServerPlayer) player);
                 //if(finalClusterCount >= MAX_LEVEL) {
                 //    Indexed.FILL_CRYSTAL_GLOBE.trigger((ServerPlayerEntity) player);
                 //}
@@ -150,58 +147,58 @@ public class CrystalGlobeBlock extends Block {
             }
 
 
-            return ActionResult.SUCCESS;
-        } else if(player.getStackInHand(hand).isOf(IndexedItems.VITALIS)
-                || player.getStackInHand(hand).isOf(Items.ECHO_SHARD)) {
+            return InteractionResult.SUCCESS;
+        } else if(player.getItemInHand(hand).is(IndexedItems.VITALIS)
+                || player.getItemInHand(hand).is(Items.ECHO_SHARD)) {
             crystalUseEffects(state, world, pos);
 
-            if(world instanceof ServerWorld) {
-                this.dropExperience((ServerWorld) world, pos, 10);
+            if(world instanceof ServerLevel) {
+                this.popExperience((ServerLevel) world, pos, 10);
             }
 
             if(!player.isCreative()) {
-                player.getStackInHand(hand).decrement(1);
+                player.getItemInHand(hand).shrink(1);
             }
 
 
 
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         } else {
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         }
     }
 
-    private int getCrystalPower(World world, BlockPos pos) {
+    private int getCrystalPower(Level world, BlockPos pos) {
         //return 25 + (Math.min(countAmethystClusters(pos, world, false),8)*3);
         return 30;
     }
 
-    private void incrementCrystalLevel(BlockState state, World world, BlockPos pos) {
-        int i = state.get(LEVEL);
+    private void incrementCrystalLevel(BlockState state, Level world, BlockPos pos) {
+        int i = state.getValue(LEVEL);
 
-        if(i < MAX_LEVEL && (world.getRandom().nextInt(100)) <= getCrystalPower(world, pos) && !world.isClient()) {
+        if(i < MAX_LEVEL && (world.getRandom().nextInt(100)) <= getCrystalPower(world, pos) && !world.isClientSide()) {
             i++;
-            world.setBlockState(pos, state.with(LEVEL, i), Block.NOTIFY_ALL);
+            world.setBlock(pos, state.setValue(LEVEL, i), Block.UPDATE_ALL);
         }
     }
 
 
 
-    private boolean destroyAmethyst(BlockPos.Mutable checkedPos, BlockPos pos, World world) {
+    private boolean destroyAmethyst(BlockPos.MutableBlockPos checkedPos, BlockPos pos, Level world) {
         int random = world.getRandom().nextInt(100);
 
         if(random <= 12) {
-            if(!world.isClient()) {
-                world.breakBlock(checkedPos, true, null, Block.NOTIFY_ALL);
+            if(!world.isClientSide()) {
+                world.destroyBlock(checkedPos, true, null, Block.UPDATE_ALL);
 
-                Vec3d positionOne = new Vec3d(pos.getX(), pos.getY(),pos.getZ());
-                Vec3d positionTwo = new Vec3d(checkedPos.getX(), checkedPos.getY(), checkedPos.getZ());
-                Vec3d positionLerp;
+                Vec3 positionOne = new Vec3(pos.getX(), pos.getY(),pos.getZ());
+                Vec3 positionTwo = new Vec3(checkedPos.getX(), checkedPos.getY(), checkedPos.getZ());
+                Vec3 positionLerp;
 
                 for(double alpha = 0; alpha <= 1; alpha+=0.025) {
                     positionLerp = lerpVector(positionOne, positionTwo, alpha);
-                    if(world instanceof ServerWorld) {
-                        ((ServerWorld)world).spawnParticles(IndexedParticles.CRYSTAL_BREAK, positionLerp.x+0.5, positionLerp.y+0.5, positionLerp.z+0.5, 1, 0, 0, 0, 0);
+                    if(world instanceof ServerLevel) {
+                        ((ServerLevel)world).sendParticles(IndexedParticles.CRYSTAL_BREAK, positionLerp.x+0.5, positionLerp.y+0.5, positionLerp.z+0.5, 1, 0, 0, 0, 0);
                     }
                 }
             }
@@ -211,12 +208,12 @@ public class CrystalGlobeBlock extends Block {
         }
     }
 
-    private int countAmethystClusters(BlockPos pos, World world, boolean destroyAmethyst) {
+    private int countAmethystClusters(BlockPos pos, Level world, boolean destroyAmethyst) {
         int scanSize = 3;
         int clusterCount = 0;
         int amethystBroken = 0;
 
-        BlockPos.Mutable checkedPos = pos.mutableCopy();
+        BlockPos.MutableBlockPos checkedPos = pos.mutable();
         checkedPos = checkedPos.move(-scanSize,0,-scanSize);
 
         for(int i = -scanSize; i <= scanSize; i++) {
@@ -251,45 +248,45 @@ public class CrystalGlobeBlock extends Block {
     }
 
 
-    public void randomDisplayTick(BlockState state, World world, BlockPos pos, net.minecraft.util.math.random.Random random) {
-        if (random.nextInt(3) == 0 && state.get(LEVEL) >= MAX_LEVEL) {
-            world.addParticleClient(IndexedParticles.CRYSTAL_HARVEST, pos.getX() + world.getRandom().nextFloat()*1, pos.getY()+ world.getRandom().nextFloat()*1, pos.getZ()+ world.getRandom().nextFloat()*1, random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D);
+    public void animateTick(BlockState state, Level world, BlockPos pos, net.minecraft.util.RandomSource random) {
+        if (random.nextInt(3) == 0 && state.getValue(LEVEL) >= MAX_LEVEL) {
+            world.addParticle(IndexedParticles.CRYSTAL_HARVEST, pos.getX() + world.getRandom().nextFloat()*1, pos.getY()+ world.getRandom().nextFloat()*1, pos.getZ()+ world.getRandom().nextFloat()*1, random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D);
         }
 
-        if (random.nextInt(24) == 0 && state.get(LEVEL) >= MAX_LEVEL) {
-            world.playSoundClient(pos.getX(), pos.getY(), pos.getZ(), Indexed.CRYSTAL_AMBIENT_SOUND_EVENT, SoundCategory.BLOCKS, 2f, getRandomPitch(world), true);
+        if (random.nextInt(24) == 0 && state.getValue(LEVEL) >= MAX_LEVEL) {
+            world.playLocalSound(pos.getX(), pos.getY(), pos.getZ(), Indexed.CRYSTAL_AMBIENT_SOUND_EVENT, SoundSource.BLOCKS, 2f, getRandomPitch(world), true);
         }
 
     }
 
-    private float getRandomPitch(World world) {
+    private float getRandomPitch(Level world) {
         return 0.8f + (world.getRandom().nextFloat() * 0.4f);
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(LEVEL);
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState state) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
-        return state.get(LEVEL);
+    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
+        return state.getValue(LEVEL);
     }
 
     @Override
-    public boolean canPathfindThrough(BlockState state, NavigationType type) {
+    public boolean isPathfindable(BlockState state, PathComputationType type) {
         return false;
     }
 
 
     static {
         STATE_TO_LUMINANCE = (state) -> {
-            return 2 * (Integer)state.get(LEVEL);
+            return 2 * (Integer)state.getValue(LEVEL);
         };
     }
 

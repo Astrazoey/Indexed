@@ -11,7 +11,8 @@ import java.util.Properties;
 
 public class ConfigMain {
 
-    private static final float MOD_VERSION = 1.7f;
+    // Bump this whenever default item caps change so existing installations receive them.
+    private static final float MOD_VERSION = 26.21f;
 
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("indexed.properties");
 

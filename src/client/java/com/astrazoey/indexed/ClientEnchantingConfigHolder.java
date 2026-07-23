@@ -1,11 +1,9 @@
 package com.astrazoey.indexed;
 
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-
 import java.util.Collections;
 import java.util.Map;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Item;
 
 public final class ClientEnchantingConfigHolder {
     private static Map<String, EnchantabilityConfig> CONFIG = Collections.emptyMap();
@@ -15,7 +13,7 @@ public final class ClientEnchantingConfigHolder {
     }
 
     public static EnchantabilityConfig get(Item item) {
-        String id = String.valueOf(Registries.ITEM.getId(item));
+        String id = String.valueOf(BuiltInRegistries.ITEM.getKey(item));
         return CONFIG.getOrDefault(id, new EnchantabilityConfig(0, 0));
     }
 }

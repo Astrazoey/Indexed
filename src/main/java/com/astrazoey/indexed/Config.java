@@ -5,13 +5,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.item.Item;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registry;
-
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -85,21 +81,14 @@ public class Config {
     }
 
     public static void registerConfigListItems() {
-        for(int i = 0; i < configList.size(); i++) {
-            Object configEntry = configList.keySet().toArray()[i];
-            EnchantabilityConfig enchantConfig = configList.get(configEntry);
-            String itemName = (String) configEntry;
+        for (var configEntry : configList.entrySet()) {
+            String itemName = configEntry.getKey();
+            EnchantabilityConfig enchantConfig = configEntry.getValue();
             int maxSlots = enchantConfig.maxEnchantingSlots;
             float repairScale = enchantConfig.repairScaling;
 
-            //System.out.println("Found entry at " + i + ". It is called \"" + itemName + "\" and has " + maxSlots + " max slots and repair scaling of " + repairScale);
-
-            Identifier itemIdentifier = Identifier.of(itemName);
-            ThreadLocal<Identifier> localItemIdentifier = new ThreadLocal<Identifier>();
-            localItemIdentifier.set(itemIdentifier);
-
-            Item registerItem = Registries.ITEM.get(localItemIdentifier.get());
-
+            Identifier itemIdentifier = Identifier.parse(itemName);
+            Item registerItem = BuiltInRegistries.ITEM.getValue(itemIdentifier);
 
             MaxEnchantingSlots.setEnchantType(registerItem, new EnchantingType(new EnchantingType.Settings().maxEnchantingSlots(maxSlots).repairScaling(repairScale)));
 
@@ -242,6 +231,13 @@ public class Config {
         defaultConfig.put("minecraft:crossbow", EnchantingTypes.CROSSBOW.getEnchantabilityConfig());
         defaultConfig.put("minecraft:bow", EnchantingTypes.BOW.getEnchantabilityConfig());
         defaultConfig.put("minecraft:trident", EnchantingTypes.TRIDENT.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:wooden_spear", EnchantingTypes.WOOD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:stone_spear", EnchantingTypes.STONE_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:copper_spear", EnchantingTypes.COPPER_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:iron_spear", EnchantingTypes.IRON_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:golden_spear", EnchantingTypes.GOLD_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:diamond_spear", EnchantingTypes.DIAMOND_TIER.getEnchantabilityConfig());
+        defaultConfig.put("minecraft:netherite_spear", EnchantingTypes.NETHERITE_TIER.getEnchantabilityConfig());
         defaultConfig.put("minecraft:turtle_helmet", EnchantingTypes.TURTLE_HELMET.getEnchantabilityConfig());
         defaultConfig.put("minecraft:mace", EnchantingTypes.MACE.getEnchantabilityConfig());
 

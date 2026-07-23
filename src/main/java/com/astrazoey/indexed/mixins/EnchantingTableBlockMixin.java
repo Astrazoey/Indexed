@@ -1,7 +1,5 @@
 package com.astrazoey.indexed.mixins;
 
-import net.minecraft.block.EnchantingTableBlock;
-import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -11,17 +9,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.EnchantingTableBlock;
 
 @Mixin(EnchantingTableBlock.class)
 public class EnchantingTableBlockMixin {
 
     @Mutable
     @Shadow @Final
-    public static List<BlockPos> POWER_PROVIDER_OFFSETS;
+    public static List<BlockPos> BOOKSHELF_OFFSETS;
 
     @Inject(method="<clinit>", at = @At(value = "TAIL"))
     private static void changePowerProvider(CallbackInfo ci) {
-        POWER_PROVIDER_OFFSETS = BlockPos.stream(-3, 0, -3, 3, 2, 3).map(BlockPos::toImmutable).toList();
+        BOOKSHELF_OFFSETS = BlockPos.betweenClosedStream(-3, 0, -3, 3, 2, 3).map(BlockPos::immutable).toList();
     }
 
 

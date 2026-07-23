@@ -1,27 +1,34 @@
 package com.astrazoey.indexed.mixins;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.projectile.TridentEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.TridentItem;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.stat.Stats;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.*;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.arrow.ThrownTrident;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TridentItem;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -33,67 +40,67 @@ public class RiptideMixin extends Item {
     public ThreadLocal<ItemStack> tridentItem = new ThreadLocal<ItemStack>();
     public ThreadLocal<LivingEntity> tridentOwner = new ThreadLocal<LivingEntity>();
 
-    public RiptideMixin(Settings settings) {
+    public RiptideMixin(Properties settings) {
         super(settings);
     }
 
     @Inject(method="use", at = @At(value="RETURN", ordinal = 1), cancellable = true)
-    public void allowRiptideUsage(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        ItemStack itemStack = user.getStackInHand(hand);
+    public void allowRiptideUsage(Level world, Player user, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+        ItemStack itemStack = user.getItemInHand(hand);
         if(EnchantmentHelper.getTridentSpinAttackStrength(itemStack, user) > 0) {
-            user.setCurrentHand(hand);
-            cir.setReturnValue(ActionResult.CONSUME);
+            user.startUsingItem(hand);
+            cir.setReturnValue(InteractionResult.CONSUME);
 
         }
     }
 
-    @Redirect(method="onStoppedUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;isTouchingWaterOrRain()Z"))
-    public boolean allowRiptideToFireWithoutWater(PlayerEntity playerEntity) {
+    @Redirect(method="releaseUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isInWaterOrRain()Z"))
+    public boolean allowRiptideToFireWithoutWater(Player playerEntity) {
         return true;
     }
 
-    @Inject(method="onStoppedUsing", at = @At(value = "HEAD"))
-    public void getVariables(ItemStack stack, World world, LivingEntity user, int remainingUseTicks, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method="releaseUsing", at = @At(value = "HEAD"))
+    public void getVariables(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks, CallbackInfoReturnable<Boolean> cir) {
         tridentItem.set(stack);
         tridentOwner.set(user);
     }
 
-    @ModifyConstant(method="onStoppedUsing", constant = @Constant(floatValue = 0.0f, ordinal = 0))
+    @ModifyConstant(method="releaseUsing", constant = @Constant(floatValue = 0.0f, ordinal = 0))
     public float denyRiptideEffectIfDryOrdinalZero(float constant) {
-        if(tridentOwner.get().isTouchingWaterOrRain()) {
+        if(tridentOwner.get().isInWaterOrRain()) {
             return 0F;
         } else {
             return 100F;
         }
     }
 
-    @ModifyConstant(method="onStoppedUsing", constant = @Constant(floatValue = 0.0f, ordinal = 3))
+    @ModifyConstant(method="releaseUsing", constant = @Constant(floatValue = 0.0f, ordinal = 3))
     public float denyRiptideEffectIfDryOrdinalThree(float constant) {
-        if(tridentOwner.get().isTouchingWaterOrRain()) {
+        if(tridentOwner.get().isInWaterOrRain()) {
             return 0F;
         } else {
             return 100F;
         }
     }
 
-    @Inject(method="onStoppedUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;damage(ILnet/minecraft/entity/player/PlayerEntity;)V"), cancellable = true)
-    public void useRiptideIfDry(ItemStack stack, World world, LivingEntity user, int remainingUseTicks, CallbackInfoReturnable<Boolean> cir) {
-        PlayerEntity playerEntity = (PlayerEntity)user;
+    @Inject(method="releaseUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtWithoutBreaking(ILnet/minecraft/world/entity/player/Player;)V"), cancellable = true)
+    public void useRiptideIfDry(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks, CallbackInfoReturnable<Boolean> cir) {
+        Player playerEntity = (Player)user;
 
         float riptideLevel = EnchantmentHelper.getTridentSpinAttackStrength(stack, user);
 
 
-        if (riptideLevel > 0 && !playerEntity.isTouchingWaterOrRain()) {
+        if (riptideLevel > 0 && !playerEntity.isInWaterOrRain()) {
             //System.out.println("Trident has riptide but isn't touching water!");
-            playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
+            playerEntity.awardStat(Stats.ITEM_USED.get(this));
 
-            ItemStack itemStack = stack.splitUnlessCreative(1, playerEntity);
-            TridentEntity tridentEntity = ProjectileEntity.spawnWithVelocity(TridentEntity::new, (ServerWorld)world, itemStack, playerEntity, 0.0F, riptideLevel * 0.25f + 2.5f, 1.0F);
-            if (playerEntity.isInCreativeMode()) {
-                tridentEntity.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
+            ItemStack itemStack = stack.consumeAndReturn(1, playerEntity);
+            ThrownTrident tridentEntity = Projectile.spawnProjectileFromRotation(ThrownTrident::new, (ServerLevel)world, itemStack, playerEntity, 0.0F, riptideLevel * 0.25f + 2.5f, 1.0F);
+            if (playerEntity.hasInfiniteMaterials()) {
+                tridentEntity.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
             }
 
-            world.playSoundFromEntity((PlayerEntity)null, tridentEntity, SoundEvents.ITEM_TRIDENT_THROW.value(), SoundCategory.PLAYERS, 1.0F, 1.0F);
+            world.playSound((Player)null, tridentEntity, SoundEvents.TRIDENT_THROW.value(), SoundSource.PLAYERS, 1.0F, 1.0F);
             //System.out.println("Method cancelled");
             cir.cancel();
         }
@@ -105,19 +112,19 @@ class LivingEntityMixin {
 
 
     //Allow channeling and riptide compat
-    @Inject(method="tickRiptide", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;attackLivingEntity(Lnet/minecraft/entity/LivingEntity;)V"))
-    public void applyLightningEffectToRiptide(Box a, Box b, CallbackInfo ci) {
+    @Inject(method="checkAutoSpinAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;doAutoAttackOnTouch(Lnet/minecraft/world/entity/LivingEntity;)V"))
+    public void applyLightningEffectToRiptide(AABB a, AABB b, CallbackInfo ci) {
 
         Entity entity = (Entity) (Object) this;
 
-        if(EnchantmentHelper.getEquipmentLevel(entity.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(Enchantments.CHANNELING), entity.getEntity()) > 0) {
-            if (((LivingEntity) (Object) this).getEntityWorld().isSkyVisible(((LivingEntity) (Object) this).getBlockPos())) {
-                LightningEntity lightningEntity = (LightningEntity) EntityType.LIGHTNING_BOLT.create(((LivingEntity) (Object) this).getEntityWorld(), SpawnReason.TRIGGERED);
+        if(EnchantmentHelper.getEnchantmentLevel(entity.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.CHANNELING), entity.asLivingEntity()) > 0) {
+            if (((LivingEntity) (Object) this).level().canSeeSky(((LivingEntity) (Object) this).blockPosition())) {
+                LightningBolt lightningEntity = ((EntityType<LightningBolt>) (Object) BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.withDefaultNamespace("lightning_bolt"))).create(((LivingEntity) (Object) this).level(), EntitySpawnReason.TRIGGERED);
                 assert lightningEntity != null;
-                lightningEntity.refreshPositionAfterTeleport(Vec3d.ofBottomCenter(((LivingEntity) (Object) this).getBlockPos()));
-                lightningEntity.setChanneler(entity instanceof ServerPlayerEntity ? (ServerPlayerEntity)entity : null);
-                ((LivingEntity) (Object) this).getEntityWorld().spawnEntity(lightningEntity);
-                SoundEvent soundEvent = SoundEvents.ITEM_TRIDENT_THUNDER.value();
+                lightningEntity.snapTo(Vec3.atBottomCenterOf(((LivingEntity) (Object) this).blockPosition()));
+                lightningEntity.setCause(entity instanceof ServerPlayer ? (ServerPlayer)entity : null);
+                ((LivingEntity) (Object) this).level().addFreshEntity(lightningEntity);
+                SoundEvent soundEvent = SoundEvents.TRIDENT_THUNDER.value();
                 ((LivingEntity) (Object) this).playSound(soundEvent, 5.0F, 1.0F);
             }
 

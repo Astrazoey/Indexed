@@ -1,25 +1,24 @@
 package com.astrazoey.indexed.mixins;
 
 import com.astrazoey.indexed.registry.IndexedItems;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.EnchantmentScreenHandler;
+import net.minecraft.world.inventory.EnchantmentMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(EnchantmentScreenHandler.class)
+@Mixin(EnchantmentMenu.class)
 public class GoldBoundBookMixin {
-    @Redirect(method = "method_17410", at = @At(value="INVOKE", target = "Lnet/minecraft/item/ItemStack;isOf(Lnet/minecraft/item/Item;)Z", ordinal = 0))
-    public boolean allowBookItem(ItemStack itemStack, Item item) {
-        return itemStack.isOf(Items.BOOK) || itemStack.isOf(IndexedItems.GOLD_BOUND_BOOK);
+    @Redirect(method = "slotsChanged(Lnet/minecraft/world/Container;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEnchantable()Z"))
+    private boolean indexed$allowGoldBoundBookInTable(ItemStack itemStack) {
+        return itemStack.isEnchantable() || itemStack.is(IndexedItems.GOLD_BOUND_BOOK);
     }
 
-    @Redirect(method = "generateEnchantments", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isOf(Lnet/minecraft/item/Item;)Z", ordinal = 0))
-    public boolean allowBookItem2(ItemStack itemStack, Item item) {
-        return itemStack.isOf(Items.BOOK) || itemStack.isOf(IndexedItems.GOLD_BOUND_BOOK);
+    @Redirect(method = "getEnchantmentList(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/item/ItemStack;II)Ljava/util/List;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;is(Ljava/lang/Object;)Z"))
+    private boolean indexed$isGoldBoundBook(ItemStack itemStack, Object item) {
+        return itemStack.is(Items.BOOK) || itemStack.is(IndexedItems.GOLD_BOUND_BOOK);
     }
 
 
@@ -28,16 +27,14 @@ public class GoldBoundBookMixin {
 @Mixin(EnchantmentHelper.class)
 class GoldBoundBookEnchantmentMixin {
 
-    @Redirect(method = "getPossibleEntries", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isOf(Lnet/minecraft/item/Item;)Z"))
-    private static boolean allowBookItem(ItemStack itemStack, Item item) {
-
-
-        return itemStack.isOf(Items.BOOK) || itemStack.isOf(IndexedItems.GOLD_BOUND_BOOK);
+    @Redirect(method = "getAvailableEnchantmentResults(ILnet/minecraft/world/item/ItemStack;Ljava/util/stream/Stream;)Ljava/util/List;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;is(Ljava/lang/Object;)Z"))
+    private static boolean indexed$isGoldBoundBook(ItemStack itemStack, Object item) {
+        return itemStack.is(Items.BOOK) || itemStack.is(IndexedItems.GOLD_BOUND_BOOK);
     }
 
-    @Redirect(method = "enchant(Lnet/minecraft/util/math/random/Random;Lnet/minecraft/item/ItemStack;ILjava/util/stream/Stream;)Lnet/minecraft/item/ItemStack;", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isOf(Lnet/minecraft/item/Item;)Z"))
-    private static boolean allowBookItem2(ItemStack itemStack, Item item) {
-        return itemStack.isOf(Items.BOOK) || itemStack.isOf(IndexedItems.GOLD_BOUND_BOOK);
+    @Redirect(method = "enchantItem(Lnet/minecraft/util/RandomSource;Lnet/minecraft/world/item/ItemStack;ILjava/util/stream/Stream;)Lnet/minecraft/world/item/ItemStack;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;is(Ljava/lang/Object;)Z"))
+    private static boolean indexed$isGoldBoundBookWhenEnchanting(ItemStack itemStack, Object item) {
+        return itemStack.is(Items.BOOK) || itemStack.is(IndexedItems.GOLD_BOUND_BOOK);
     }
 
 

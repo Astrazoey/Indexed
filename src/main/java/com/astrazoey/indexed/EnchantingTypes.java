@@ -1,9 +1,5 @@
 package com.astrazoey.indexed;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.effect.WitherStatusEffect;
-import net.minecraft.entity.mob.MobEntity;
-
 public class EnchantingTypes {
     public static final EnchantingType GENERIC;
 

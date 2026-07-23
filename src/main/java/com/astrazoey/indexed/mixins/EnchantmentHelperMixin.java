@@ -4,21 +4,6 @@ import com.astrazoey.indexed.Indexed;
 import com.astrazoey.indexed.MaxEnchantingSlots;
 import com.astrazoey.indexed.registry.IndexedItems;
 import com.google.common.collect.Lists;
-import net.minecraft.advancement.criterion.EnchantedItemCriterion;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.EnchantmentLevelEntry;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.screen.EnchantmentScreenHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
@@ -27,6 +12,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 import java.util.stream.Stream;
+import net.minecraft.advancements.triggers.EnchantedItemTrigger;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.EnchantmentMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
 
 import static java.lang.Math.min;
 
@@ -38,14 +38,14 @@ public class EnchantmentHelperMixin {
     private static ThreadLocal<ItemStack> generatedItemType = new ThreadLocal<ItemStack>();
 
 
-    @Inject(method = "generateEnchantments", at = @At(value = "HEAD"))
-    private static void getItemStack(Random random, ItemStack stack, int level, Stream<RegistryEntry<Enchantment>> possibleEnchantments, CallbackInfoReturnable<List<EnchantmentLevelEntry>> cir) {
+    @Inject(method = "selectEnchantment", at = @At(value = "HEAD"))
+    private static void getItemStack(RandomSource random, ItemStack stack, int level, Stream<Holder<Enchantment>> possibleEnchantments, CallbackInfoReturnable<List<EnchantmentInstance>> cir) {
         generatedItemType.set(stack);
     }
 
-    @ModifyConstant(method = "generateEnchantments", constant = @Constant(intValue = 50, ordinal = 0))
+    @ModifyConstant(method = "selectEnchantment", constant = @Constant(intValue = 50, ordinal = 0))
     private static int increaseGoldBookEffectiveness(int constant) {
-        if(generatedItemType.get().isOf(IndexedItems.GOLD_BOUND_BOOK)) {
+        if(generatedItemType.get().is(IndexedItems.GOLD_BOUND_BOOK)) {
             return 10;
         } else {
             return constant;
@@ -53,8 +53,8 @@ public class EnchantmentHelperMixin {
     }
 
     // Special infinity behavior
-    @Inject(method = "getAmmoUse", at = @At(value = "HEAD"), cancellable = true)
-    private static void onStoppedUsing(ServerWorld world, ItemStack rangedWeaponStack, ItemStack projectileStack, int baseAmmoUse, CallbackInfoReturnable<Integer> cir) {
+    @Inject(method = "processAmmoUse", at = @At(value = "HEAD"), cancellable = true)
+    private static void onStoppedUsing(ServerLevel world, ItemStack rangedWeaponStack, ItemStack projectileStack, int baseAmmoUse, CallbackInfoReturnable<Integer> cir) {
 
         int infinityLevel = Indexed.getEnchantmentValue(Indexed.REPLENISH_PROJECTILE, world, rangedWeaponStack);
 
@@ -69,12 +69,12 @@ public class EnchantmentHelperMixin {
 
 
 
-    @Inject(method = "getPossibleEntries", at = @At(value = "HEAD"), cancellable = true)
-    private static void checkAcceptableEnchantments(int level, ItemStack stack, Stream<RegistryEntry<Enchantment>> possibleEnchantments, CallbackInfoReturnable<List<EnchantmentLevelEntry>> cir) {
+    @Inject(method = "getAvailableEnchantmentResults", at = @At(value = "HEAD"), cancellable = true)
+    private static void checkAcceptableEnchantments(int level, ItemStack stack, Stream<Holder<Enchantment>> possibleEnchantments, CallbackInfoReturnable<List<EnchantmentInstance>> cir) {
 
-        List<EnchantmentLevelEntry> returnList = Lists.<EnchantmentLevelEntry>newArrayList();
+        List<EnchantmentInstance> returnList = Lists.<EnchantmentInstance>newArrayList();
 
-        boolean bl = stack.isOf(Items.BOOK) || stack.isOf(IndexedItems.GOLD_BOUND_BOOK);
+        boolean bl = stack.is(Items.BOOK) || stack.is(IndexedItems.GOLD_BOUND_BOOK);
 
         possibleEnchantments.filter(enchantment -> doStuff(enchantment, stack) || bl).forEach(enchantmentx -> {
             Enchantment enchantment = (Enchantment)enchantmentx.value();
@@ -83,17 +83,17 @@ public class EnchantmentHelperMixin {
             int minLevel = enchantment.getMinLevel();
 
             // Get Forgery I only in the enchanting table
-            if(enchantment.effects().contains(Indexed.REDUCE_REPAIR_COST)) {
+            if(enchantment.effects().has(Indexed.REDUCE_REPAIR_COST)) {
                 maxLevel = 1;
             }
 
             // Get Unbreaking III only in the table
-            else if(enchantmentx.matchesKey(Enchantments.UNBREAKING)) {
+            else if(enchantmentx.is(Enchantments.UNBREAKING)) {
                 maxLevel = 3;
             }
 
             // Get Mending II only in the table
-            else if(enchantmentx.matchesKey(Enchantments.MENDING)) {
+            else if(enchantmentx.is(Enchantments.MENDING)) {
                 maxLevel = 2;
             }
 
@@ -101,8 +101,8 @@ public class EnchantmentHelperMixin {
 
 
             for (int j = maxLevel; j >= minLevel; j--) {
-                if (level >= enchantment.getMinPower(j) && level <= enchantment.getMaxPower(j)) {
-                    returnList.add(new EnchantmentLevelEntry(enchantmentx, j));
+                if (level >= enchantment.getMinCost(j) && level <= enchantment.getMaxCost(j)) {
+                    returnList.add(new EnchantmentInstance(enchantmentx, j));
                     break;
                 }
             }
@@ -115,9 +115,9 @@ public class EnchantmentHelperMixin {
 
     //Exclude unbreaking from Gold Bound Book enchantments
     @Unique
-    private static boolean doStuff(RegistryEntry<Enchantment> enchantment, ItemStack stack) {
-        if(stack.isOf(IndexedItems.GOLD_BOUND_BOOK)) {
-            if(enchantment.matchesKey(Enchantments.UNBREAKING)) {
+    private static boolean doStuff(Holder<Enchantment> enchantment, ItemStack stack) {
+        if(stack.is(IndexedItems.GOLD_BOUND_BOOK)) {
+            if(enchantment.is(Enchantments.UNBREAKING)) {
                 return false;
             }
         }
@@ -127,51 +127,51 @@ public class EnchantmentHelperMixin {
 }
 
 
-@Mixin(EnchantmentScreenHandler.class)
+@Mixin(EnchantmentMenu.class)
 class TakeEnchantment {
 
     @Unique
     ThreadLocal<Integer> effectLevel = new ThreadLocal<Integer>();
 
     //Grant Gold Book Enchantment
-    @Inject(method = "method_17410", at = @At(value="INVOKE", target = "Lnet/minecraft/advancement/criterion/EnchantedItemCriterion;trigger(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/item/ItemStack;I)V"))
-    public void grantGoldBookAdvancement(ItemStack itemStack, int i, PlayerEntity playerEntity, int j, ItemStack itemStack2, World world, BlockPos pos, CallbackInfo ci) {
-        if(itemStack.isOf(IndexedItems.GOLD_BOUND_BOOK)) {
-            Indexed.ENCHANT_GOLD_BOOK.trigger((ServerPlayerEntity) playerEntity);
+    @Inject(method = "lambda$clickMenuButton$0(Lnet/minecraft/world/item/ItemStack;ILnet/minecraft/world/entity/player/Player;ILnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/advancements/triggers/EnchantedItemTrigger;trigger(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/item/ItemStack;I)V"))
+    public void grantGoldBookAdvancement(ItemStack itemStack, int i, Player playerEntity, int j, ItemStack itemStack2, Level world, BlockPos pos, CallbackInfo ci) {
+        if(itemStack.is(IndexedItems.GOLD_BOUND_BOOK)) {
+            Indexed.ENCHANT_GOLD_BOOK.trigger((ServerPlayer) playerEntity);
         }
     }
 
     //Get Player Enchanted Level
-    @Inject(method="method_17410", at = @At(value="HEAD"))
-    public void getPlayerEnchantedLevel(ItemStack itemStack, int i, PlayerEntity playerEntity, int j, ItemStack itemStack2, World world, BlockPos pos, CallbackInfo ci) {
+    @Inject(method = "lambda$clickMenuButton$0(Lnet/minecraft/world/item/ItemStack;ILnet/minecraft/world/entity/player/Player;ILnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V", at = @At(value = "HEAD"))
+    public void getPlayerEnchantedLevel(ItemStack itemStack, int i, Player playerEntity, int j, ItemStack itemStack2, Level world, BlockPos pos, CallbackInfo ci) {
         try {
-            effectLevel.set(playerEntity.getStatusEffect(Indexed.ENCHANTED_STATUS_EFFECT).getAmplifier()+1);
+            effectLevel.set(playerEntity.getEffect(Indexed.ENCHANTED_STATUS_EFFECT).getAmplifier()+1);
         } catch (NullPointerException e) {
             effectLevel.set(0);
         }
 
         if(effectLevel.get() > 0) {
-            if(playerEntity instanceof ServerPlayerEntity) {
-                Indexed.ENCHANTED_ADVANCEMENT.trigger((ServerPlayerEntity) playerEntity);
+            if(playerEntity instanceof ServerPlayer) {
+                Indexed.ENCHANTED_ADVANCEMENT.trigger((ServerPlayer) playerEntity);
             }
         }
 
     }
 
     //Take Enchanted Status Effect Into Account
-    @Redirect(method="method_17410", at = @At(value="INVOKE", target = "Lnet/minecraft/item/ItemStack;addEnchantment(Lnet/minecraft/registry/entry/RegistryEntry;I)V"))
-    public void enchantedStatusEffect(ItemStack instance, RegistryEntry<Enchantment> enchantment, int level) {
+    @Redirect(method = "lambda$clickMenuButton$0(Lnet/minecraft/world/item/ItemStack;ILnet/minecraft/world/entity/player/Player;ILnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;enchant(Lnet/minecraft/core/Holder;I)V"))
+    public void enchantedStatusEffect(ItemStack instance, Holder<Enchantment> enchantment, int level) {
         if(effectLevel != null) {
             int newEnchantmentLevel = min(level+effectLevel.get(), enchantment.value().getMaxLevel());
-            instance.addEnchantment(enchantment, newEnchantmentLevel);
+            instance.enchant(enchantment, newEnchantmentLevel);
         } else {
-            instance.addEnchantment(enchantment, level);
+            instance.enchant(enchantment, level);
         }
     }
 
     //Grant Overcharged Advancement
-    @Redirect(method = "method_17410", at = @At(value="INVOKE", target = "Lnet/minecraft/advancement/criterion/EnchantedItemCriterion;trigger(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/item/ItemStack;I)V"))
-    public void grantOverchargedAdvancement(EnchantedItemCriterion instance, ServerPlayerEntity player, ItemStack stack, int levels) {
+    @Redirect(method = "lambda$clickMenuButton$0(Lnet/minecraft/world/item/ItemStack;ILnet/minecraft/world/entity/player/Player;ILnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/advancements/triggers/EnchantedItemTrigger;trigger(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/item/ItemStack;I)V"))
+    public void grantOverchargedAdvancement(EnchantedItemTrigger instance, ServerPlayer player, ItemStack stack, int levels) {
 
         if(MaxEnchantingSlots.getEnchantType(stack) != null) {
             if(MaxEnchantingSlots.getCurrent(stack) > MaxEnchantingSlots.getEnchantType(stack).getMaxEnchantingSlots()) {

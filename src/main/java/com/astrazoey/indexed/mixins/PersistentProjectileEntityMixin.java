@@ -1,23 +1,23 @@
 package com.astrazoey.indexed.mixins;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
-@Mixin(PersistentProjectileEntity.class)
+@Mixin(AbstractArrow.class)
 public class PersistentProjectileEntityMixin {
-    @ModifyConstant(method="onEntityHit", constant = @Constant(floatValue = 5.0F))
+    @ModifyConstant(method="onHitEntity", constant = @Constant(floatValue = 5.0F))
     public float buffDuration(float constant) {
 
-        PersistentProjectileEntity projectile = ((PersistentProjectileEntity)(Object)this);
-        if (projectile.getOwner() == null || projectile.getWeaponStack() == null)
+        AbstractArrow projectile = ((AbstractArrow)(Object)this);
+        if (projectile.getOwner() == null || projectile.getWeaponItem() == null)
             return constant;
 
-        int flameLevel = EnchantmentHelper.getLevel(projectile.getOwner().getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(Enchantments.FLAME), projectile.getWeaponStack());
+        int flameLevel = EnchantmentHelper.getItemEnchantmentLevel(projectile.getOwner().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.FLAME), projectile.getWeaponItem());
 
         if (flameLevel > 0) {
 

@@ -2,23 +2,23 @@ package com.astrazoey.indexed.mixins;
 
 import com.astrazoey.indexed.ConfigMain;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import net.minecraft.registry.tag.TagGroupLoader;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagLoader;
 
-@Mixin(TagGroupLoader.class)
+@Mixin(TagLoader.class)
 public class TagGroupLoaderMixin {
-    @ModifyReturnValue(method="loadTags", at = @At(value="TAIL"))
-    public Map<Identifier, List<TagGroupLoader.TrackedEntry>> loadTags(Map<Identifier, List<TagGroupLoader.TrackedEntry>> original) {
-        List<TagGroupLoader.TrackedEntry> entriesToRemove = new ArrayList<>();
+    @ModifyReturnValue(method="load", at = @At(value="TAIL"))
+    public Map<Identifier, List<TagLoader.EntryWithSource>> loadTags(Map<Identifier, List<TagLoader.EntryWithSource>> original) {
+        List<TagLoader.EntryWithSource> entriesToRemove = new ArrayList<>();
         for (var resource : original.entrySet()) {
-            if (resource.getKey().toTranslationKey().equals("minecraft.tradeable")) {
-                for (TagGroupLoader.TrackedEntry entry : resource.getValue())
+            if (resource.getKey().toLanguageKey().equals("minecraft.tradeable")) {
+                for (TagLoader.EntryWithSource entry : resource.getValue())
                 {
                     String entryName = entry.entry().toString();
                     if (entryName.equals("#minecraft:non_treasure")) {
@@ -28,7 +28,7 @@ public class TagGroupLoaderMixin {
                     }
                 }
             }
-            for (TagGroupLoader.TrackedEntry removable : entriesToRemove) {
+            for (TagLoader.EntryWithSource removable : entriesToRemove) {
                 resource.getValue().remove(removable);
             }
         }
