@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.astrazoey.indexed.fabric.client.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "AnvilScreenMixin",
+    "ItemToolTipMixin"
+  ],
+  "injectors": { "defaultRequire": 1 }
+}

@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "${mod_id}",
+	"version": "${version}",
+	"name": "${mod_name}",
+	"description": "${description}",
+	"authors": [
+		"${mod_author}"
+	],
+	"license": "${license}",
+	"icon": "assets/indexed/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.astrazoey.indexed.fabric.IndexedFabric"
+		],
+		"client": [
+			"com.astrazoey.indexed.fabric.client.IndexedClientFabric"
+		]
+	},
+	"mixins": [
+		"${mod_id}.mixins.json",
+		{
+			"config": "${mod_id}.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=${fabric_loader_version}",
+		"minecraft": "~${minecraft_version}",
+		"java": ">=${java_version}",
+		"fabric-api": "*"
+	}
+}

@@ -1,7 +1,5 @@
 # gradle
 
-.migration-backup-yarn-1.21.10
-.tooling/
 .gradle/
 build/
 out/
@@ -33,3 +31,12 @@ bin/
 # fabric
 
 run/
+
+# java
+
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
+/neoforge/runs/
+/fabric/runs/

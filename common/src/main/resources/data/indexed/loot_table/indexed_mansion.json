@@ -1,0 +1,40 @@
+{
+  "pools": [
+    {
+      "rolls": 5,
+      "conditions": [
+        {
+          "condition": "random_chance",
+          "chance": 0.5
+        }
+      ],
+      "entries": [
+        {
+          "type": "item",
+          "weight": 1,
+          "name": "minecraft:book",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 2,
+                "max": 6
+              }
+            },
+            {
+              "function": "enchant_randomly",
+              "options": [
+                "minecraft:mending",
+                "minecraft:fortune",
+                "minecraft:silk_touch",
+                "minecraft:frost_walker",
+                "minecraft:multishot",
+                "minecraft:power"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

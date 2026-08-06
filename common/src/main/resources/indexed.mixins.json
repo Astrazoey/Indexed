@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.astrazoey.indexed.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "AnvilScreenHandlerMixin",
+    "ColorSpecialMixin",
+    "CriteriaTriggersAccessor",
+    "EnchantingTableBlockMixin",
+    "EnchantmentHelperMixin",
+    "GoldBoundBookMixin",
+    //"GoldBoundBookEnchantmentMixin",
+    "ItemMixin",
+    "TakeEnchantment"
+  ],
+  "injectors": { "defaultRequire": 1 },
+  "overwrites": { "requireAnnotations": true }
+}
